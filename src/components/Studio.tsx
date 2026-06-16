@@ -420,18 +420,17 @@ export const Studio: React.FC = () => {
 
       <div className="page-header" style={{ marginTop: 0 }}>
         <h1 className="page-title">画室 Studio</h1>
-        <p className="page-subtitle">强大的画布引擎，支持基础微调、创意滤镜、自由旋转与涂鸦</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {/* Canvas Display Area */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '340px', margin: 0, padding: '1.25rem' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '240px', margin: 0, padding: '0.6rem' }}>
           {currentImage ? (
             <div
               style={{
                 position: 'relative',
                 width: '100%',
-                maxHeight: '320px',
+                maxHeight: '220px',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -450,7 +449,7 @@ export const Studio: React.FC = () => {
                 onTouchEnd={stopDrawing}
                 style={{
                   maxWidth: '100%',
-                  maxHeight: '300px',
+                  maxHeight: '210px',
                   borderRadius: 'var(--radius-sm)',
                   boxShadow: 'var(--shadow-glass)',
                   background: '#0a0a14',
@@ -459,11 +458,10 @@ export const Studio: React.FC = () => {
               />
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 1rem' }}>
-              <Edit2 style={{ width: 36, height: 36 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
+              <Edit2 style={{ width: 28, height: 28 }} />
               <div>
-                <h3 style={{ color: 'var(--text-secondary)', marginBottom: '6px', fontSize: '0.95rem' }}>Studio 编辑区为空</h3>
-                <p style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>您可以上传一张本地图片，或从“搜图中心”、“AI生图”将图片导入此处编辑</p>
+                <h3 style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '0.85rem' }}>编辑区为空</h3>
               </div>
               <input
                 type="file"
@@ -472,57 +470,57 @@ export const Studio: React.FC = () => {
                 onChange={handleFileUpload}
                 style={{ display: 'none' }}
               />
-              <button className="btn btn-primary" style={{ padding: '0.65rem 1rem', fontSize: '0.8rem' }} onClick={() => fileInputRef.current?.click()}>
-                上传本地图片
+              <button className="btn btn-primary" style={{ padding: '4px 8px', fontSize: '0.75rem' }} onClick={() => fileInputRef.current?.click()}>
+                上传图片
               </button>
             </div>
           )}
 
           {/* Quick action buttons below canvas */}
           {currentImage && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '1.25rem', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.6rem', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem' }}>
               {/* Operations Row */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
-                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleUndo} disabled={historyIdx <= 0} title="撤销">
-                  <Undo style={{ width: 14 }} />
+              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', alignItems: 'center' }}>
+                <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={handleUndo} disabled={historyIdx <= 0}>
+                  <Undo style={{ width: 12 }} />
                 </button>
-                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleRedo} disabled={historyIdx >= history.length - 1} title="重做">
-                  <Redo style={{ width: 14 }} />
+                <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={handleRedo} disabled={historyIdx >= history.length - 1}>
+                  <Redo style={{ width: 12 }} />
                 </button>
                 
-                <div style={{ width: '1px', height: '18px', background: 'var(--border-color)' }} />
+                <div style={{ width: '1px', height: '14px', background: 'var(--border-color)' }} />
                 
-                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleRotate} title="旋转 90 度">
-                  <RotateCw style={{ width: 14 }} />
+                <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={handleRotate}>
+                  <RotateCw style={{ width: 12 }} />
                 </button>
-                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={() => handleFlip('h')} title="水平翻转">
-                  <FlipHorizontal style={{ width: 14 }} />
+                <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={() => handleFlip('h')}>
+                  <FlipHorizontal style={{ width: 12 }} />
                 </button>
-                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={() => handleFlip('v')} title="垂直翻转">
-                  <FlipVertical style={{ width: 14 }} />
+                <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={() => handleFlip('v')}>
+                  <FlipVertical style={{ width: 12 }} />
                 </button>
 
-                <div style={{ width: '1px', height: '18px', background: 'var(--border-color)' }} />
+                <div style={{ width: '1px', height: '14px', background: 'var(--border-color)' }} />
                 
-                <button className="btn btn-secondary" style={{ padding: '8px 12px', color: 'var(--danger)' }} onClick={handleClearCanvas} title="清空全部更改">
-                  <Trash2 style={{ width: 14 }} />
+                <button className="btn btn-secondary" style={{ padding: '4px 8px', color: 'var(--danger)' }} onClick={handleClearCanvas}>
+                  <Trash2 style={{ width: 12 }} />
                 </button>
               </div>
 
               {/* Save & Export Row */}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button className="btn btn-secondary" style={{ flex: 1, padding: '0.65rem', fontSize: '0.8rem' }} onClick={handleDownload}>
-                  <Download style={{ width: 14 }} />
-                  导出图片
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button className="btn btn-secondary" style={{ flex: 1, padding: '4px 0', fontSize: '0.75rem' }} onClick={handleDownload}>
+                  <Download style={{ width: 12 }} />
+                  下载
                 </button>
                 <button
                   className={`btn ${saveSuccess ? 'btn-secondary' : 'btn-primary'}`}
-                  style={{ flex: 1.2, padding: '0.65rem', fontSize: '0.8rem', color: saveSuccess ? 'var(--success)' : '' }}
+                  style={{ flex: 1.2, padding: '4px 0', fontSize: '0.75rem', color: saveSuccess ? 'var(--success)' : '' }}
                   onClick={handleSaveToGallery}
                   disabled={loading}
                 >
-                  {saveSuccess ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
-                  <span>{saveSuccess ? '已保存至画廊' : '保存至画廊'}</span>
+                  {saveSuccess ? <Check style={{ width: 12 }} /> : <Heart style={{ width: 12 }} />}
+                  <span>{saveSuccess ? '已收藏' : '收藏'}</span>
                 </button>
               </div>
             </div>
@@ -530,29 +528,29 @@ export const Studio: React.FC = () => {
         </div>
 
         {/* Settings Panel */}
-        <div className="glass-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="glass-panel" style={{ margin: 0, padding: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {/* Sub Tabs */}
-          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', padding: '2px', border: '1px solid var(--border-color)' }}>
             <button
               className={`btn ${activeTool === 'adjust' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('adjust')}
             >
-              基础调节
+              微调
             </button>
             <button
               className={`btn ${activeTool === 'filter' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('filter')}
             >
-              艺术滤镜
+              滤镜
             </button>
             <button
               className={`btn ${activeTool === 'draw' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('draw')}
             >
-              涂鸦绘画
+              涂鸦
             </button>
           </div>
 

@@ -493,32 +493,31 @@ export const CreatorSpace: React.FC = () => {
       </div>
 
       <div className="page-header" style={{ marginTop: 0 }}>
-        <h1 className="page-title">画坊与头像</h1>
-        <p className="page-subtitle">水印声明、精美语录卡片、个性社交头像框一键快速出图</p>
+        <h1 className="page-title">创意画坊</h1>
       </div>
 
       {/* Segmented Selector for Sub-Tools */}
-      <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', padding: '2px', border: '1px solid var(--border-color)', marginBottom: '0.75rem' }}>
         <button
           className={`btn ${activeTool === 'watermark' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
           onClick={() => setActiveTool('watermark')}
         >
-          图片水印
+          水印
         </button>
         <button
           className={`btn ${activeTool === 'quote' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
           onClick={() => setActiveTool('quote')}
         >
-          语录卡片
+          卡片
         </button>
         <button
           className={`btn ${activeTool === 'avatar' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          style={{ flex: 1, padding: '4px 0', fontSize: '0.7rem', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
           onClick={() => setActiveTool('avatar')}
         >
-          社交头像框
+          头像框
         </button>
       </div>
 

@@ -8,32 +8,32 @@ export const ToolsPortal: React.FC = () => {
   const tools = [
     {
       id: 'ai' as const,
-      title: 'AI 智能绘画',
-      desc: '输入创意脑洞，AI 自动绘图，支持提示词优化',
+      title: 'AI 绘画',
+      desc: '输入创意描述，AI 快速作画',
       icon: Sparkles,
       color: 'linear-gradient(135deg, #6366f1, #a855f7)',
       shadow: 'rgba(99, 102, 241, 0.2)'
     },
     {
       id: 'meme' as const,
-      title: '经典表情包制作',
-      desc: '支持多图层文字手势拖拽、潮流恶搞贴纸叠加',
+      title: '表情包制作',
+      desc: '多图层拖拽，添加恶搞贴纸',
       icon: Laugh,
       color: 'linear-gradient(135deg, #a855f7, #ec4899)',
       shadow: 'rgba(168, 85, 247, 0.2)'
     },
     {
       id: 'studio' as const,
-      title: '画室与滤镜 Studio',
-      desc: '高档滤镜色调调节、自由涂鸦、图片比例裁剪',
+      title: '画室 Studio',
+      desc: '滤镜调节、手写涂鸦与旋转',
       icon: Sliders,
       color: 'linear-gradient(135deg, #06b6d4, #10b981)',
       shadow: 'rgba(6, 182, 212, 0.2)'
     },
     {
       id: 'creator' as const,
-      title: '创意相框与水印',
-      desc: '制作微信头像挂件相框、添加个人水印、语录卡片',
+      title: '创意画坊',
+      desc: '头像框挂件、水印与语录卡片',
       icon: Image,
       color: 'linear-gradient(135deg, #f59e0b, #ef4444)',
       shadow: 'rgba(245, 158, 11, 0.2)'

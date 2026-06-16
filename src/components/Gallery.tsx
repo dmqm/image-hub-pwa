@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { GalleryItem } from '../context/AppContext';
-import { Trash2, Edit2, Download, Copy, Image, Check, Tag } from 'lucide-react';
+import { Trash2, Download, Copy, Image, Check, Tag } from 'lucide-react';
 
 export const Gallery: React.FC = () => {
   const { gallery, deleteFromGallery, importToStudio } = useApp();
@@ -47,26 +47,25 @@ export const Gallery: React.FC = () => {
   return (
     <div className="animate-fade-in">
       <div className="page-header">
-        <h1 className="page-title">我的画廊</h1>
-        <p className="page-subtitle">管理本地 IndexedDB 存储的照片与自制表情包，安全隐私，支持离线</p>
+        <h1 className="page-title">本地画廊</h1>
       </div>
 
       {/* Tags Filter bar */}
       {gallery.length > 0 && (
-        <div className="glass-panel" style={{ padding: '1rem 1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-            <Tag style={{ width: 16 }} />
-            按标签筛选：
+        <div className="glass-panel" style={{ padding: '0.5rem 0.75rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+            <Tag style={{ width: 14 }} />
+            分类：
           </span>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {allTags.map((tag) => (
               <button
                 key={tag}
                 className={`btn ${selectedTag === tag ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '4px 12px', fontSize: '0.75rem', borderRadius: '8px' }}
+                style={{ padding: '2px 8px', fontSize: '0.7rem', borderRadius: '6px' }}
                 onClick={() => setSelectedTag(tag)}
               >
-                {tag === 'all' ? '全部图片' : `#${tag}`}
+                {tag === 'all' ? '全部' : `#${tag}`}
               </button>
             ))}
           </div>
@@ -112,7 +111,7 @@ export const Gallery: React.FC = () => {
               }}
             >
               {/* Image Preview Box */}
-              <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#0a0a14' }}>
+              <div style={{ position: 'relative', width: '100%', height: '140px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
                   src={item.dataUrl}
                   alt={item.title}
@@ -124,46 +123,39 @@ export const Gallery: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    width: '16px',
-                    height: '16px',
+                    top: '6px',
+                    right: '6px',
+                    width: '12px',
+                    height: '12px',
                     borderRadius: '50%',
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
-                    border: '2px solid #ffffff',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                    border: '1.5px solid #ffffff',
                   }}
-                  title={`平均颜色: RGB(${item.color.r}, ${item.color.g}, ${item.color.b})`}
                 />
               </div>
 
               {/* Text metadata */}
-              <div style={{ padding: '8px 5px', flex: '1', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ padding: '6px 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {item.title}
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  {item.date}
-                </span>
-
-                {/* Tags */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '12px' }}>
-                  {item.tags.map((tag, idx) => (
-                    <span key={idx} style={{ fontSize: '0.7rem', color: 'var(--primary)', background: 'var(--primary-glow)', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                
+                {/* Tags (max 2) */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+                  {item.tags.slice(0, 2).map((tag, idx) => (
+                    <span key={idx} style={{ fontSize: '0.65rem', color: 'var(--primary)', background: 'var(--primary-glow)', padding: '1px 4px', borderRadius: '3px' }}>
                       #{tag}
                     </span>
                   ))}
                 </div>
 
                 {/* Card Operations */}
-                <div style={{ display: 'flex', gap: '6px', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', gap: '4px', marginTop: 'auto' }}>
                   <button
                     className="btn btn-secondary"
-                    style={{ flex: '1', padding: '0.45rem', fontSize: '0.8rem' }}
+                    style={{ flex: '1', padding: '4px 0', fontSize: '0.75rem' }}
                     onClick={() => importToStudio(item.dataUrl)}
-                    title="导入 Studio 再次编辑"
                   >
-                    <Edit2 style={{ width: 14, marginRight: '4px' }} />
                     编辑
                   </button>
 

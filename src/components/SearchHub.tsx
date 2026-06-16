@@ -267,59 +267,57 @@ export const SearchHub: React.FC = () => {
   return (
     <div className="animate-fade-in">
       <div className="page-header">
-        <h1 className="page-title">搜图中心</h1>
-        <p className="page-subtitle">探索高清灵感图片，支持以色搜图和一键导入处理</p>
+        <h1 className="page-title">搜图</h1>
       </div>
 
       {/* Source & Search Control */}
-      <div className="glass-panel" style={{ padding: '1.5rem' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div className="glass-panel" style={{ padding: '0.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.75rem' }}>
           {/* Tab Switch */}
-          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', padding: '2px', border: '1px solid var(--border-color)' }}>
             <button
               className={`btn ${activeSource === 'local' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '0.5rem 1.25rem', borderRadius: '10px', boxShadow: activeSource === 'local' ? '' : 'none', border: 'none' }}
+              style={{ flex: 1, padding: '6px 0', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveSource('local')}
             >
-              内置与本地图库
+              本地图库
             </button>
             <button
               className={`btn ${activeSource === 'online' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '0.5rem 1.25rem', borderRadius: '10px', boxShadow: activeSource === 'online' ? '' : 'none', border: 'none' }}
+              style={{ flex: 1, padding: '6px 0', borderRadius: '6px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveSource('online')}
             >
-              在线 Pixabay 搜图
+              在线搜图
             </button>
           </div>
 
           {/* Search Inputs */}
-          <div style={{ display: 'flex', gap: '0.5rem', flex: '1', minWidth: '280px', maxWidth: '500px' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', width: '100%' }}>
             <input
               type="text"
               className="input-field"
               style={{ flex: '1', margin: 0 }}
-              placeholder={activeSource === 'local' ? "搜索标签或图片名称..." : "输入英文关键词（如 'neon space'）"}
+              placeholder={activeSource === 'local' ? "搜索标签或名称..." : "输入英文关键词..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <button className="btn btn-primary" onClick={handleSearch} disabled={loading}>
-              {loading ? <RefreshCw className="animate-spin" style={{ width: 18 }} /> : <Search style={{ width: 18 }} />}
-              搜索
+            <button className="btn btn-primary" style={{ padding: '0 12px' }} onClick={handleSearch} disabled={loading}>
+              {loading ? <RefreshCw className="animate-spin" style={{ width: 14 }} /> : <Search style={{ width: 14 }} />}
             </button>
           </div>
         </div>
 
         {/* Color Search Panel (以色搜图) */}
-        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <Sliders style={{ width: 18, color: 'var(--primary)' }} />
-            <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>色彩过滤与以色搜图</span>
+        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <Sliders style={{ width: 14, color: 'var(--primary)' }} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>以色搜图</span>
             {selectedColor && (
-              <span style={{ fontSize: '0.8rem', background: 'var(--primary-glow)', border: '1px solid var(--primary)', padding: '2px 8px', borderRadius: '10px', color: 'var(--text-primary)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                已启用: {selectedColorName}
+              <span style={{ fontSize: '0.75rem', background: 'var(--primary-glow)', border: '1px solid var(--primary)', padding: '1px 6px', borderRadius: '6px', color: 'var(--text-primary)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {selectedColorName}
                 <Trash2
-                  style={{ width: 12, cursor: 'pointer', color: 'var(--danger)' }}
+                  style={{ width: 10, cursor: 'pointer', color: 'var(--danger)' }}
                   onClick={() => {
                     setSelectedColor(null);
                     setUploadedColorImage(null);
@@ -329,9 +327,9 @@ export const SearchHub: React.FC = () => {
             )}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Color Palette Filter */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', flex: '1', minWidth: '260px' }}>
+            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
               {colorPalette.map((item, idx) => (
                 <div
                   key={idx}
@@ -341,8 +339,9 @@ export const SearchHub: React.FC = () => {
                     setUploadedColorImage(null);
                   }}
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '24px',
+                    height: '24px',
+                    flexShrink: 0,
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
                     borderRadius: '50%',
                     cursor: 'pointer',
@@ -350,18 +349,14 @@ export const SearchHub: React.FC = () => {
                     border: selectedColor && selectedColor.r === item.color.r && selectedColor.g === item.color.g && selectedColor.b === item.color.b
                       ? '2px solid #ffffff'
                       : '1px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                    transition: 'transform 0.2s',
                   }}
                   title={item.name}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 />
               ))}
             </div>
 
             {/* Upload image to match color */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input
                 type="file"
                 accept="image/*"
@@ -371,18 +366,18 @@ export const SearchHub: React.FC = () => {
               />
               <button
                 className="btn btn-secondary"
-                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                style={{ padding: '4px 8px', fontSize: '0.75rem', flex: 1 }}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Upload style={{ width: 16 }} />
-                上传图片找相似色
+                <Upload style={{ width: 12 }} />
+                上传图片找色
               </button>
               
               {uploadedColorImage && (
                 <img
                   src={uploadedColorImage}
                   alt="Upload Color Source"
-                  style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--primary)' }}
+                  style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--primary)' }}
                 />
               )}
             </div>
@@ -431,7 +426,7 @@ export const SearchHub: React.FC = () => {
               }}
             >
               {/* Image Box */}
-              <div style={{ position: 'relative', width: '100%', height: '200px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#0a0a14' }}>
+              <div style={{ position: 'relative', width: '100%', height: '140px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
                   src={item.url}
                   alt={item.title}
@@ -441,8 +436,8 @@ export const SearchHub: React.FC = () => {
                 
                 {/* Labels & Tags */}
                 {item.isPreset && (
-                  <span style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>
-                    内置推荐
+                  <span style={{ position: 'absolute', top: '6px', left: '6px', background: 'var(--primary)', color: '#fff', fontSize: '0.65rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px' }}>
+                    内置
                   </span>
                 )}
                 
@@ -450,51 +445,48 @@ export const SearchHub: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    width: '18px',
-                    height: '18px',
+                    top: '6px',
+                    right: '6px',
+                    width: '12px',
+                    height: '12px',
                     borderRadius: '50%',
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
-                    border: '2px solid #ffffff',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                    border: '1.5px solid #ffffff',
                   }}
-                  title={`平均色彩: RGB(${item.color.r}, ${item.color.g}, ${item.color.b})`}
                 />
               </div>
 
               {/* Text Meta */}
-              <div style={{ padding: '10px 5px', flex: '1', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ padding: '6px 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {item.title}
                 </h3>
                 
-                {/* Tags */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
-                  {item.tags.slice(0, 3).map((tag, idx) => (
-                    <span key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                {/* Tags (max 2, small size) */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+                  {item.tags.slice(0, 2).map((tag, idx) => (
+                    <span key={idx} style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px' }}>
                       #{tag}
                     </span>
                   ))}
                 </div>
 
                 {/* Card Action Buttons */}
-                <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', gap: '6px', marginTop: 'auto' }}>
                   <button
                     className="btn btn-secondary"
-                    style={{ flex: '1', padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                    style={{ flex: '1', padding: '4px 0', fontSize: '0.75rem' }}
                     onClick={() => handleImportToStudio(item)}
                   >
-                    导入编辑
+                    编辑
                   </button>
                   <button
                     className={`btn ${savedIds[item.id] ? 'btn-secondary' : 'btn-primary'}`}
-                    style={{ padding: '0.5rem 0.85rem', color: savedIds[item.id] ? 'var(--success)' : '' }}
+                    style={{ padding: '4px 8px', color: savedIds[item.id] ? 'var(--success)' : '' }}
                     onClick={() => handleSaveToGallery(item)}
                     disabled={savedIds[item.id] || loading}
-                    title="保存到画廊"
                   >
-                    {savedIds[item.id] ? <Check style={{ width: 16 }} /> : <Heart style={{ width: 16, fill: 'none' }} />}
+                    {savedIds[item.id] ? <Check style={{ width: 12 }} /> : <Heart style={{ width: 12 }} />}
                   </button>
                 </div>
               </div>

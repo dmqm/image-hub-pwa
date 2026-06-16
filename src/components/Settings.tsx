@@ -66,32 +66,31 @@ export const SettingsPanel: React.FC = () => {
   };
 
   const themesInfo = [
-    { id: 'light' as ColorTheme, name: '极简明亮 (Light Mode)', color: '#ffffff' },
-    { id: 'cyberpunk' as ColorTheme, name: '赛博深蓝 (Default Dark)', color: '#06060c' },
-    { id: 'amoled' as ColorTheme, name: 'AMOLED 纯黑 (OLED)', color: '#000000' },
-    { id: 'aurora' as ColorTheme, name: '极光深紫 (Purple)', color: '#0a0518' }
+    { id: 'light' as ColorTheme, name: '极简明亮', color: '#ffffff' },
+    { id: 'cyberpunk' as ColorTheme, name: '赛博深蓝', color: '#06060c' },
+    { id: 'amoled' as ColorTheme, name: 'AMOLED 纯黑', color: '#000000' },
+    { id: 'aurora' as ColorTheme, name: '极光深紫', color: '#0a0518' }
   ];
 
   return (
     <div className="animate-fade-in">
       <div className="page-header">
         <h1 className="page-title">系统设置</h1>
-        <p className="page-subtitle">配置您的移动端颜色模式、备份恢复与 API 密钥，数据 100% 存储在本地</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem', alignItems: 'start' }}>
         
         {/* Left Side Form settings */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           
           {/* Mobile Colors Theme Selector */}
-          <div className="glass-panel" style={{ margin: 0 }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Palette style={{ width: 18, color: 'var(--primary)' }} />
-              移动端色彩模式 (OLED 优化)
+          <div className="glass-panel" style={{ margin: 0, padding: '0.75rem' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Palette style={{ width: 14, color: 'var(--primary)' }} />
+              色彩模式
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {themesInfo.map((t) => (
                 <div
                   key={t.id}
@@ -100,41 +99,35 @@ export const SettingsPanel: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    borderRadius: 'var(--radius-md)',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
                     background: theme === t.id ? 'var(--primary-glow)' : 'var(--bg-input)',
                     border: `1px solid ${theme === t.id ? 'var(--primary)' : 'var(--border-color)'}`,
                     cursor: 'pointer',
                     transition: 'var(--transition-smooth)'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: t.color, border: '1px solid rgba(255,255,255,0.2)' }} />
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '16px', height: '16px', borderRadius: '50%', backgroundColor: t.color, border: '1px solid rgba(255,255,255,0.2)' }} />
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{t.name}</span>
                   </div>
-                  {theme === t.id && <Check style={{ width: 16, color: 'var(--primary)' }} />}
+                  {theme === t.id && <Check style={{ width: 14, color: 'var(--primary)' }} />}
                 </div>
               ))}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '10px', lineHeight: '1.4' }}>
-              💡 <b>提示：</b> 推荐在 iPhone (OLED 屏幕) 上开启 <b>AMOLED 纯黑</b> 模式，可以大幅节省屏幕功耗，展现极致对比度。
-            </span>
           </div>
 
           {/* Backup and Restore */}
-          <div className="glass-panel" style={{ margin: 0 }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Database style={{ width: 18, color: 'var(--primary)' }} />
-              本地图库备份与恢复
+          <div className="glass-panel" style={{ margin: 0, padding: '0.75rem' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Database style={{ width: 14, color: 'var(--primary)' }} />
+              备份与恢复
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.5' }}>
-              因为数据 100% 存在浏览器本地 IndexedDB 中，当您清除手机 Safari 缓存或更换设备时，图片可能会丢失。建议定期备份图库：
-            </p>
 
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <button className="btn btn-secondary" style={{ flex: 1, padding: '0.75rem 1rem', fontSize: '0.85rem', display: 'inline-flex', gap: '6px' }} onClick={handleExportBackup}>
-                <Download style={{ width: 16 }} />
-                导出数据备份
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button className="btn btn-secondary" style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', display: 'inline-flex', gap: '4px', justifyContent: 'center' }} onClick={handleExportBackup}>
+                <Download style={{ width: 12 }} />
+                导出备份
               </button>
 
               <input
@@ -146,18 +139,18 @@ export const SettingsPanel: React.FC = () => {
               />
               <button
                 className="btn btn-secondary"
-                style={{ flex: 1, padding: '0.75rem 1rem', fontSize: '0.85rem', display: 'inline-flex', gap: '6px', color: importStatus === 'success' ? 'var(--success)' : '' }}
+                style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', display: 'inline-flex', gap: '4px', color: importStatus === 'success' ? 'var(--success)' : '', justifyContent: 'center' }}
                 onClick={() => importFileRef.current?.click()}
               >
-                {importStatus === 'success' ? <Check style={{ width: 16 }} /> : <Upload style={{ width: 16 }} />}
-                {importStatus === 'success' ? '导入成功' : '导入备份文件'}
+                {importStatus === 'success' ? <Check style={{ width: 12 }} /> : <Upload style={{ width: 12 }} />}
+                {importStatus === 'success' ? '导入' : '导入备份'}
               </button>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '1.25rem', paddingTop: '1rem' }}>
-              <button className="btn btn-secondary" onClick={handleClearDatabase} style={{ width: '100%', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)', display: 'inline-flex', gap: '8px' }}>
-                <Trash2 style={{ width: 16 }} />
-                清空本地画廊数据库
+            <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.75rem', paddingTop: '0.5rem' }}>
+              <button className="btn btn-secondary" onClick={handleClearDatabase} style={{ width: '100%', padding: '6px 0', fontSize: '0.75rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.1)', display: 'inline-flex', gap: '4px', justifyContent: 'center' }}>
+                <Trash2 style={{ width: 12 }} />
+                清空本地画廊
               </button>
             </div>
           </div>
@@ -167,19 +160,19 @@ export const SettingsPanel: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* API Keys Configuration */}
-          <div className="glass-panel" style={{ margin: 0 }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Key style={{ width: 18, color: 'var(--primary)' }} />
-              API 密钥配置
+          <div className="glass-panel" style={{ margin: 0, padding: '0.75rem' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Key style={{ width: 14, color: 'var(--primary)' }} />
+              API 密钥
             </h3>
 
             {/* Pixabay Key */}
             <div className="input-group">
-              <label className="input-label" style={{ fontSize: '0.75rem' }}>Pixabay API Key (在线搜图)</label>
+              <label className="input-label" style={{ fontSize: '0.65rem' }}>Pixabay Key (搜图)</label>
               <input
                 type="password"
                 className="input-field"
-                placeholder="填入 Pixabay API Key..."
+                placeholder="Pixabay Key..."
                 value={pixabayKey}
                 onChange={(e) => setPixabayKey(e.target.value)}
               />
@@ -187,11 +180,11 @@ export const SettingsPanel: React.FC = () => {
 
             {/* SiliconFlow Key */}
             <div className="input-group">
-              <label className="input-label" style={{ fontSize: '0.75rem' }}>SiliconFlow API Key (高速生图)</label>
+              <label className="input-label" style={{ fontSize: '0.65rem' }}>SiliconFlow Key (生图)</label>
               <input
                 type="password"
                 className="input-field"
-                placeholder="填入 SiliconFlow API Key..."
+                placeholder="SiliconFlow Key..."
                 value={siliconFlowKey}
                 onChange={(e) => setSiliconFlowKey(e.target.value)}
               />
@@ -199,11 +192,11 @@ export const SettingsPanel: React.FC = () => {
 
             {/* DeepSeek Key */}
             <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label" style={{ fontSize: '0.75rem' }}>DeepSeek API Key (提示词润色)</label>
+              <label className="input-label" style={{ fontSize: '0.65rem' }}>DeepSeek Key (润色)</label>
               <input
                 type="password"
                 className="input-field"
-                placeholder="填入 DeepSeek API Key..."
+                placeholder="DeepSeek Key..."
                 value={deepSeekKey}
                 onChange={(e) => setDeepSeekKey(e.target.value)}
               />
@@ -211,17 +204,16 @@ export const SettingsPanel: React.FC = () => {
           </div>
 
           {/* Mobile Install Guide */}
-          <div className="glass-panel" style={{ margin: 0, padding: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Smartphone style={{ width: 18, color: 'var(--primary)' }} />
-              iPhone 安装独立 App 说明
+          <div className="glass-panel" style={{ margin: 0, padding: '0.75rem' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Smartphone style={{ width: 14, color: 'var(--primary)' }} />
+              iPhone 安装 App
             </h3>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', lineHeight: '1.4', color: 'var(--text-secondary)' }}>
-              <p>1. 用 iPhone 上的 <b>Safari 浏览器</b> 打开部署好的网页。</p>
-              <p>2. 点击 Safari 底部底栏的 <b>“分享”</b> 按钮（带箭头的方框）。</p>
-              <p>3. 向下滚动并选择 <b>“添加到主屏幕” (Add to Home Screen)</b> 并确认。</p>
-              <p>4. 随后即可在手机桌面像点击原生 App 一样直接打开使用，支持无网离线运行。</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.75rem', lineHeight: '1.4', color: 'var(--text-secondary)' }}>
+              <p>1. 在 iPhone 的 <b>Safari 浏览器</b> 中打开此网页。</p>
+              <p>2. 点击 Safari 底部 <b>“分享”</b> 按钮（带箭头的方框）。</p>
+              <p>3. 选择 <b>“添加到主屏幕” (Add to Home Screen)</b> 并确认。</p>
             </div>
           </div>
 

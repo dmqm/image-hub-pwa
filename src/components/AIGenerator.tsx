@@ -234,32 +234,31 @@ export const AIGenerator: React.FC = () => {
       </button>
 
       <div className="page-header" style={{ marginTop: 0 }}>
-        <h1 className="page-title">AI 智能绘画</h1>
-        <p className="page-subtitle">使用自然语言生成令人惊叹的图片，国内免翻墙高速响应</p>
+        <h1 className="page-title">AI 生图</h1>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {/* Prompt Input Section */}
         <div className="glass-panel" style={{ margin: 0, padding: '1.25rem' }}>
           <div className="input-group" style={{ marginBottom: 0 }}>
-            <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span>输入创意描述 (中文/英文)</span>
+            <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <span>输入创意描述</span>
               {deepSeekKey && (
                 <button
                   className="btn btn-secondary"
-                  style={{ padding: '3px 8px', fontSize: '0.7rem', borderRadius: '6px', border: '1px solid rgba(99, 102, 241, 0.3)', display: 'inline-flex', gap: '4px' }}
+                  style={{ padding: '2px 6px', fontSize: '0.65rem', borderRadius: '4px', border: '1px solid rgba(99, 102, 241, 0.3)', display: 'inline-flex', gap: '2px' }}
                   onClick={handleOptimizePrompt}
                   disabled={optimizing || generating}
                 >
                   {optimizing ? <RefreshCw className="animate-spin" style={{ width: 10 }} /> : <BrainCircuit style={{ width: 10 }} />}
-                  DeepSeek 润色
+                  AI 润色
                 </button>
               )}
             </label>
             <textarea
               className="input-field"
-              style={{ height: '90px', resize: 'none', lineHeight: '1.4', fontSize: '0.85rem' }}
-              placeholder="例如：赛博朋克风的街道，下着雨，霓虹灯倒影在水洼里..."
+              style={{ height: '60px', resize: 'none', lineHeight: '1.4', fontSize: '0.8rem' }}
+              placeholder="例如：下雨的霓虹街头，赛博朋克..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               disabled={generating || optimizing}
@@ -281,14 +280,14 @@ export const AIGenerator: React.FC = () => {
           )}
 
           {/* Collapsible Advanced Settings */}
-          <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginTop: '0.5rem' }}>
             <button
               className="btn btn-secondary"
-              style={{ width: '100%', padding: '8px 12px', fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 'var(--radius-sm)' }}
+              style={{ width: '100%', padding: '6px 10px', fontSize: '0.7rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 'var(--radius-sm)' }}
               onClick={() => setShowAdvanced(!showAdvanced)}
             >
-              <span>⚙️ 高级配置 (配置引擎与风格)</span>
-              <span style={{ fontSize: '0.7rem' }}>{showAdvanced ? '收起 ⬆️' : '展开 ⬇️'}</span>
+              <span>⚙️ 高级配置</span>
+              <span style={{ fontSize: '0.65rem' }}>{showAdvanced ? '收起 ⬆️' : '展开 ⬇️'}</span>
             </button>
 
             {showAdvanced && (
@@ -354,33 +353,33 @@ export const AIGenerator: React.FC = () => {
         {/* Generate Button */}
         <button
           className="btn btn-primary"
-          style={{ width: '100%', padding: '0.85rem', fontSize: '0.95rem', boxShadow: 'var(--shadow-glow)' }}
+          style={{ width: '100%', padding: '0.6rem', fontSize: '0.85rem', boxShadow: 'var(--shadow-glow)' }}
           onClick={handleGenerate}
           disabled={generating || optimizing || (!prompt.trim() && !optimizedPrompt.trim())}
         >
           {generating ? (
             <>
-              <RefreshCw className="animate-spin" style={{ width: 16 }} />
-              <span>生图中 {selectedEngine === 'siliconflow' ? '(约2-4秒)' : '...'}</span>
+              <RefreshCw className="animate-spin" style={{ width: 14 }} />
+              <span>生成中 {selectedEngine === 'siliconflow' ? '(2-4秒)' : '...'}</span>
             </>
           ) : (
             <>
-              <Sparkles style={{ width: 16 }} />
+              <Sparkles style={{ width: 14 }} />
               <span>开始生成 AI 图像</span>
             </>
           )}
         </button>
 
         {/* Render Output Results */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', margin: 0, padding: '1.25rem' }}>
-          <div className="input-label" style={{ marginBottom: '10px' }}>生成结果</div>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', margin: 0, padding: '0.75rem' }}>
+          <div className="input-label" style={{ marginBottom: '6px', fontSize: '0.75rem' }}>生成结果</div>
           
           <div
             style={{
               width: '100%',
               aspectRatio: '1',
-              maxHeight: '380px',
-              borderRadius: 'var(--radius-md)',
+              maxHeight: '260px',
+              borderRadius: 'var(--radius-sm)',
               background: 'var(--bg-input)',
               border: '1px dashed var(--border-color)',
               display: 'flex',
@@ -392,9 +391,9 @@ export const AIGenerator: React.FC = () => {
             }}
           >
             {generating ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid var(--border-color)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }} />
-                <span style={{ fontSize: '0.8rem' }}>AI 画作绘制中...</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '50%', border: '2px solid var(--border-color)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }} />
+                <span style={{ fontSize: '0.75rem' }}>AI 画作绘制中...</span>
               </div>
             ) : generatedImgUrl ? (
               <img
@@ -403,38 +402,37 @@ export const AIGenerator: React.FC = () => {
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', textAlign: 'center', padding: '1.5rem' }}>
-                <Send style={{ width: 36, height: 36, strokeWidth: 1.25 }} />
-                <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>等待创意输入</span>
-                <span style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>输入关键词并点击生成，您的专属高清画作将在本区域展现</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
+                <Send style={{ width: 28, height: 28, strokeWidth: 1.25 }} />
+                <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)' }}>等待创意输入</span>
               </div>
             )}
           </div>
 
           {generatedImgUrl && !generating && (
-            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '1rem' }}>
-              <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.75rem' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
                 <button
                   className={`btn ${isSaved ? 'btn-secondary' : 'btn-primary'}`}
-                  style={{ flex: '1', padding: '0.65rem', fontSize: '0.8rem', color: isSaved ? 'var(--success)' : '' }}
+                  style={{ flex: '1', padding: '4px 0', fontSize: '0.75rem', color: isSaved ? 'var(--success)' : '' }}
                   onClick={handleSaveToGallery}
                   disabled={isSaved}
                 >
-                  {isSaved ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
-                  <span>{isSaved ? '已保存至画廊' : '保存至画廊'}</span>
+                  {isSaved ? <Check style={{ width: 12 }} /> : <Heart style={{ width: 12 }} />}
+                  <span>{isSaved ? '已收藏' : '收藏'}</span>
                 </button>
                 <a
                   href={generatedImgUrl}
                   download="ai_image.png"
                   className="btn btn-secondary"
-                  style={{ flex: '0.3', padding: '0.65rem', fontSize: '0.8rem', textDecoration: 'none', display: 'flex', justifyContent: 'center' }}
+                  style={{ flex: '0.3', padding: '4px 0', fontSize: '0.75rem', textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                   下载
                 </a>
               </div>
-              <button className="btn btn-secondary" style={{ width: '100%', padding: '0.65rem', fontSize: '0.8rem', display: 'inline-flex', gap: '4px' }} onClick={handleImport}>
-                <span>导入 Studio 编辑/滤镜</span>
-                <ArrowRight style={{ width: 14 }} />
+              <button className="btn btn-secondary" style={{ width: '100%', padding: '6px 0', fontSize: '0.75rem', display: 'inline-flex', gap: '2px', justifyContent: 'center' }} onClick={handleImport}>
+                <span>导入画室</span>
+                <ArrowRight style={{ width: 12 }} />
               </button>
             </div>
           )}
