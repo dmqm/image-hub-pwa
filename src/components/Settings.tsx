@@ -157,18 +157,41 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* Right Side API Keys */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           
           {/* API Keys Configuration */}
           <div className="glass-panel" style={{ margin: 0, padding: '0.75rem' }}>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Key style={{ width: 14, color: 'var(--primary)' }} />
               API 密钥
             </h3>
 
+            <div style={{
+              background: 'rgba(99, 102, 241, 0.03)',
+              border: '1px dashed rgba(99, 102, 241, 0.2)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '6px 8px',
+              marginBottom: '10px',
+              fontSize: '0.68rem',
+              lineHeight: '1.4',
+              color: 'var(--text-secondary)'
+            }}>
+              🔒 <b>隐私声明：</b> 所有密钥仅保存在您的本地浏览器缓存中，直接请求 API 服务商，不经过任何第三方服务器中转，安全无害。
+            </div>
+
             {/* Pixabay Key */}
-            <div className="input-group">
-              <label className="input-label" style={{ fontSize: '0.65rem' }}>Pixabay Key (搜图)</label>
+            <div className="input-group" style={{ marginBottom: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="input-label" style={{ fontSize: '0.65rem', margin: 0 }}>Pixabay Key (搜图)</label>
+                <a 
+                  href="https://pixabay.com/api/docs/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ fontSize: '0.6rem', color: 'var(--primary)', textDecoration: 'none' }}
+                >
+                  🔗 免费获取 Key
+                </a>
+              </div>
               <input
                 type="password"
                 className="input-field"
@@ -176,11 +199,24 @@ export const SettingsPanel: React.FC = () => {
                 value={pixabayKey}
                 onChange={(e) => setPixabayKey(e.target.value)}
               />
+              <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: '1.3' }}>
+                用于“搜图”页面。访问 Pixabay API 文档登录后在参数区直接复制生成的免费密钥。
+              </span>
             </div>
 
             {/* SiliconFlow Key */}
-            <div className="input-group">
-              <label className="input-label" style={{ fontSize: '0.65rem' }}>SiliconFlow Key (生图)</label>
+            <div className="input-group" style={{ marginBottom: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="input-label" style={{ fontSize: '0.65rem', margin: 0 }}>SiliconFlow Key (生图)</label>
+                <a 
+                  href="https://siliconflow.cn/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ fontSize: '0.6rem', color: 'var(--primary)', textDecoration: 'none' }}
+                >
+                  🔗 注册赠送额度
+                </a>
+              </div>
               <input
                 type="password"
                 className="input-field"
@@ -188,11 +224,24 @@ export const SettingsPanel: React.FC = () => {
                 value={siliconFlowKey}
                 onChange={(e) => setSiliconFlowKey(e.target.value)}
               />
+              <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: '1.3' }}>
+                用于 AI 绘画工具（搭载 FLUX.1 模型）。在硅基流动官网注册后在 API 密钥菜单创建。
+              </span>
             </div>
 
             {/* DeepSeek Key */}
             <div className="input-group" style={{ marginBottom: 0 }}>
-              <label className="input-label" style={{ fontSize: '0.65rem' }}>DeepSeek Key (润色)</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="input-label" style={{ fontSize: '0.65rem', margin: 0 }}>DeepSeek Key (润色)</label>
+                <a 
+                  href="https://platform.deepseek.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ fontSize: '0.6rem', color: 'var(--primary)', textDecoration: 'none' }}
+                >
+                  🔗 获取 API 密钥
+                </a>
+              </div>
               <input
                 type="password"
                 className="input-field"
@@ -200,6 +249,9 @@ export const SettingsPanel: React.FC = () => {
                 value={deepSeekKey}
                 onChange={(e) => setDeepSeekKey(e.target.value)}
               />
+              <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: '1.3' }}>
+                用于提示词一键智能优化。前往 DeepSeek 开放平台创建。
+              </span>
             </div>
           </div>
 
