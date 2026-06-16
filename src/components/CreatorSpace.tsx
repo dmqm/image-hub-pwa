@@ -523,11 +523,11 @@ export const CreatorSpace: React.FC = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {/* Left Canvas Display */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '320px', margin: 0, padding: '1.25rem' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '260px', margin: 0, padding: '0.6rem' }}>
           <div
             style={{
               width: '100%',
-              maxWidth: activeTool === 'quote' ? '240px' : '300px',
+              maxWidth: activeTool === 'quote' ? '200px' : '260px',
               background: '#07070d',
               border: '1px solid var(--border-color)',
               borderRadius: activeTool === 'avatar' ? '50%' : 'var(--radius-md)',
@@ -551,29 +551,29 @@ export const CreatorSpace: React.FC = () => {
           </div>
 
           {uploadImg && (
-            <div style={{ display: 'flex', gap: '8px', marginTop: '1.25rem', width: '100%', maxWidth: '300px' }}>
-              <button className="btn btn-primary" style={{ flex: 1.2, padding: '0.65rem', fontSize: '0.8rem' }} onClick={handleCopyToClipboard} disabled={loading}>
-                {copySuccess ? <Check style={{ width: 14 }} /> : <Copy style={{ width: 14 }} />}
-                <span>{copySuccess ? '已复制' : '复制到剪贴板'}</span>
+            <div style={{ display: 'flex', gap: '6px', marginTop: '0.6rem', width: '100%', maxWidth: '260px' }}>
+              <button className="btn btn-primary" style={{ flex: 1.2, padding: '4px 0', fontSize: '0.75rem' }} onClick={handleCopyToClipboard} disabled={loading}>
+                {copySuccess ? <Check style={{ width: 12 }} /> : <Copy style={{ width: 12 }} />}
+                <span>{copySuccess ? '已复制' : '复制图片'}</span>
               </button>
-              <button className="btn btn-secondary" style={{ flex: '0.3', padding: '0.65rem' }} onClick={handleDownload} disabled={loading}>
-                <Download style={{ width: 14 }} />
+              <button className="btn btn-secondary" style={{ flex: '0.3', padding: '4px 0' }} onClick={handleDownload} disabled={loading}>
+                <Download style={{ width: 12 }} />
               </button>
               <button
                 className="btn btn-secondary"
-                style={{ flex: '0.3', padding: '0.65rem', color: saveSuccess ? 'var(--success)' : '' }}
+                style={{ flex: '0.3', padding: '4px 0', color: saveSuccess ? 'var(--success)' : '' }}
                 onClick={handleSaveToGallery}
                 disabled={loading}
               >
-                {saveSuccess ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
+                {saveSuccess ? <Check style={{ width: 12 }} /> : <Heart style={{ width: 12 }} />}
               </button>
             </div>
           )}
         </div>
 
         {/* Right Settings Panel */}
-        <div className="glass-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div className="input-label" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '6px', fontSize: '0.75rem', marginBottom: '2px' }}>
+        <div className="glass-panel" style={{ margin: 0, padding: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div className="input-label" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '4px', fontSize: '0.75rem', marginBottom: '2px' }}>
             🔨 创意参数调节
           </div>
 
@@ -582,7 +582,7 @@ export const CreatorSpace: React.FC = () => {
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div className="input-group" style={{ margin: 0, gap: '4px' }}>
                 <label className="input-label" style={{ fontSize: '0.75rem' }}>水印文字</label>
-                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={wmText} onChange={(e) => setWmText(e.target.value)} />
+                <input type="text" className="input-field" style={{ fontSize: '0.85rem' }} value={wmText} onChange={(e) => setWmText(e.target.value)} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -596,7 +596,7 @@ export const CreatorSpace: React.FC = () => {
                     className="input-field"
                     value={wmStyle}
                     onChange={(e: any) => setWmStyle(e.target.value)}
-                    style={{ background: 'var(--bg-input)', padding: '0.65rem', fontSize: '0.85rem' }}
+                    style={{ background: 'var(--bg-input)', fontSize: '0.85rem' }}
                   >
                     <option value="tiled">全屏铺满平铺</option>
                     <option value="single">单行中心水印</option>
@@ -635,7 +635,7 @@ export const CreatorSpace: React.FC = () => {
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div className="input-group" style={{ margin: 0, gap: '4px' }}>
                 <label className="input-label" style={{ fontSize: '0.75rem' }}>语录顶标 (Header)</label>
-                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={quoteHeader} onChange={(e) => setQuoteHeader(e.target.value)} />
+                <input type="text" className="input-field" style={{ fontSize: '0.85rem' }} value={quoteHeader} onChange={(e) => setQuoteHeader(e.target.value)} />
               </div>
 
               <div className="input-group" style={{ margin: 0, gap: '4px' }}>
@@ -650,7 +650,7 @@ export const CreatorSpace: React.FC = () => {
 
               <div className="input-group" style={{ margin: 0, gap: '4px' }}>
                 <label className="input-label" style={{ fontSize: '0.75rem' }}>作者/出处</label>
-                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={quoteAuthor} onChange={(e) => setQuoteAuthor(e.target.value)} />
+                <input type="text" className="input-field" style={{ fontSize: '0.85rem' }} value={quoteAuthor} onChange={(e) => setQuoteAuthor(e.target.value)} />
               </div>
 
               <div className="input-group" style={{ margin: 0, gap: '4px' }}>

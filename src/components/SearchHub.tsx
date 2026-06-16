@@ -403,30 +403,23 @@ export const SearchHub: React.FC = () => {
           <span>暂无图片数据。请输入其他关键词，或者在右上角切换至“内置与本地图库”！</span>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
           {sortedResults.map((item) => (
             <div
               key={item.id}
               className="glass-panel animate-fade-in"
               style={{
-                padding: '10px',
-                borderRadius: 'var(--radius-lg)',
+                padding: '6px',
+                borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
+                margin: 0,
                 transition: 'transform 0.3s, border-color 0.3s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-6px)';
-                e.currentTarget.style.borderColor = 'var(--border-color-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'var(--border-color)';
               }}
             >
               {/* Image Box */}
-              <div style={{ position: 'relative', width: '100%', height: '140px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
+              <div style={{ position: 'relative', width: '100%', height: '100px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
                   src={item.url}
                   alt={item.title}
@@ -436,7 +429,7 @@ export const SearchHub: React.FC = () => {
                 
                 {/* Labels & Tags */}
                 {item.isPreset && (
-                  <span style={{ position: 'absolute', top: '6px', left: '6px', background: 'var(--primary)', color: '#fff', fontSize: '0.65rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ position: 'absolute', top: '4px', left: '4px', background: 'var(--primary)', color: '#fff', fontSize: '0.6rem', fontWeight: 600, padding: '1px 4px', borderRadius: '3px' }}>
                     内置
                   </span>
                 )}
@@ -445,48 +438,39 @@ export const SearchHub: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '6px',
-                    right: '6px',
-                    width: '12px',
-                    height: '12px',
+                    top: '4px',
+                    right: '4px',
+                    width: '8px',
+                    height: '8px',
                     borderRadius: '50%',
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
-                    border: '1.5px solid #ffffff',
+                    border: '1px solid #ffffff',
                   }}
                 />
               </div>
 
               {/* Text Meta */}
-              <div style={{ padding: '6px 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ padding: '4px 2px 0 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {item.title}
                 </h3>
-                
-                {/* Tags (max 2, small size) */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
-                  {item.tags.slice(0, 2).map((tag, idx) => (
-                    <span key={idx} style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px' }}>
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
 
                 {/* Card Action Buttons */}
-                <div style={{ display: 'flex', gap: '6px', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', gap: '4px', marginTop: 'auto' }}>
                   <button
                     className="btn btn-secondary"
-                    style={{ flex: '1', padding: '4px 0', fontSize: '0.75rem' }}
+                    style={{ flex: '1', padding: '3px 0', fontSize: '0.7rem' }}
                     onClick={() => handleImportToStudio(item)}
                   >
                     编辑
                   </button>
                   <button
                     className={`btn ${savedIds[item.id] ? 'btn-secondary' : 'btn-primary'}`}
-                    style={{ padding: '4px 8px', color: savedIds[item.id] ? 'var(--success)' : '' }}
+                    style={{ padding: '3px 6px', color: savedIds[item.id] ? 'var(--success)' : '' }}
                     onClick={() => handleSaveToGallery(item)}
                     disabled={savedIds[item.id] || loading}
                   >
-                    {savedIds[item.id] ? <Check style={{ width: 12 }} /> : <Heart style={{ width: 12 }} />}
+                    {savedIds[item.id] ? <Check style={{ width: 10 }} /> : <Heart style={{ width: 10 }} />}
                   </button>
                 </div>
               </div>
