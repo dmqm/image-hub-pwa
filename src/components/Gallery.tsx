@@ -4,7 +4,7 @@ import type { GalleryItem } from '../context/AppContext';
 import { Trash2, Download, Copy, Image, Check, Tag, ArrowRight } from 'lucide-react';
 
 export const Gallery: React.FC = () => {
-  const { gallery, deleteFromGallery, importToStudio } = useApp();
+  const { gallery, deleteFromGallery, importToStudio, setActiveTab } = useApp();
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [copySuccessId, setCopySuccessId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
@@ -75,17 +75,27 @@ export const Gallery: React.FC = () => {
 
       {/* Grid gallery */}
       {filteredGallery.length === 0 ? (
-        <div className="glass-panel animate-fade-in" style={{ textAlign: 'center', padding: '5rem 2rem', color: 'var(--text-secondary)' }}>
-          <Image style={{ width: 60, height: 60, strokeWidth: 1.25, color: 'var(--text-muted)', marginBottom: '1.5rem' }} />
+        <div className="glass-panel animate-fade-in" style={{ textAlign: 'center', padding: '2.5rem 1.5rem', color: 'var(--text-secondary)' }}>
+          <Image style={{ width: 44, height: 44, strokeWidth: 1.25, color: 'var(--text-muted)', marginBottom: '1rem', marginLeft: 'auto', marginRight: 'auto' }} />
           {gallery.length === 0 ? (
-            <div>
-              <h3 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>您的画廊空空如也</h3>
-              <p style={{ fontSize: '0.85rem' }}>在“搜图中心”、“AI生图”或“创意画坊”中完成制作后，点击“收藏”即可永久保存在此。</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+              <div>
+                <h3 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '0.9rem', fontWeight: 600 }}>您的画廊空空如也</h3>
+                <p style={{ fontSize: '0.75rem', lineHeight: '1.4', margin: 0 }}>完成制作或搜图后，点击“收藏”即可保存在此。</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                <button className="btn btn-primary" style={{ padding: '5px 10px', fontSize: '0.7rem' }} onClick={() => setActiveTab('tools')}>
+                  🎨 去工坊创作
+                </button>
+                <button className="btn btn-secondary" style={{ padding: '5px 10px', fontSize: '0.7rem' }} onClick={() => setActiveTab('search')}>
+                  🔍 去搜图找图
+                </button>
+              </div>
             </div>
           ) : (
             <div>
-              <h3 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>没有匹配该标签的图片</h3>
-              <p style={{ fontSize: '0.85rem' }}>点击上方的“全部图片”按钮以查看完整图库。</p>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '0.9rem', fontWeight: 600 }}>没有匹配该分类的图片</h3>
+              <p style={{ fontSize: '0.75rem', margin: 0 }}>点击上方的“全部”按钮以查看完整图库。</p>
             </div>
           )}
         </div>

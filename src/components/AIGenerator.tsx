@@ -266,6 +266,30 @@ export const AIGenerator: React.FC = () => {
             />
           </div>
 
+          {/* Quick inspiration tags */}
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '8px' }}>
+            <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', alignSelf: 'center', fontWeight: 600, marginRight: '2px' }}>
+              💡 灵感：
+            </span>
+            {[
+              '赛博朋克街头',
+              '极光星空',
+              '落日森林',
+              '写意水墨山水',
+              '猫咪宇航员'
+            ].map((tag) => (
+              <button
+                key={tag}
+                className="btn btn-secondary"
+                style={{ padding: '2px 6px', fontSize: '0.65rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.04)' }}
+                onClick={() => setPrompt(tag)}
+                disabled={generating || optimizing}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+
           {/* Optimized prompt box */}
           {optimizedPrompt && (
             <div className="input-group animate-fade-in" style={{ background: 'rgba(99, 102, 241, 0.05)', border: '1px dashed var(--primary)', padding: '10px', borderRadius: 'var(--radius-md)', marginTop: '12px', marginBottom: 0 }}>

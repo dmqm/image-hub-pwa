@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { RotateCw, FlipHorizontal, FlipVertical, Undo, Redo, Download, Heart, Check, Trash2, Edit2, ArrowLeft } from 'lucide-react';
+import { RotateCw, FlipHorizontal, FlipVertical, Undo, Redo, Download, Heart, Check, Trash2, Edit2, ArrowLeft, Upload } from 'lucide-react';
+import { PRESET_IMAGES } from '../data/presets';
 
 interface FilterPreset {
   name: string;
@@ -459,10 +460,10 @@ export const Studio: React.FC = () => {
               />
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-              <Edit2 style={{ width: 28, height: 28 }} />
-              <div>
-                <h3 style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '0.85rem' }}>编辑区为空</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '12px', padding: '0.5rem 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
+                <Edit2 style={{ width: 28, height: 28, color: 'var(--primary)' }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>编辑区为空</span>
               </div>
               <input
                 type="file"
@@ -471,9 +472,66 @@ export const Studio: React.FC = () => {
                 onChange={handleFileUpload}
                 style={{ display: 'none' }}
               />
-              <button className="btn btn-primary" style={{ padding: '4px 8px', fontSize: '0.75rem' }} onClick={() => fileInputRef.current?.click()}>
-                上传图片
+              <button 
+                className="btn btn-primary" 
+                style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: '4px' }} 
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload style={{ width: 14 }} />
+                上传本地图片
               </button>
+
+              {/* Preset Selector inside Studio Empty State */}
+              <div style={{ width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '10px', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '8px', textAlign: 'left', fontWeight: 600 }}>
+                  💡 快速导入内置素材底图：
+                </div>
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  {PRESET_IMAGES.map((img) => (
+                    <div
+                      key={img.id}
+                      onClick={async () => {
+                        try {
+                          setLoading(true);
+                          const response = await fetch(img.url);
+                          const blob = await response.blob();
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setCurrentImage(reader.result as string);
+                            setHistory([reader.result as string]);
+                            setHistoryIdx(0);
+                            setLoading(false);
+                          };
+                          reader.readAsDataURL(blob);
+                        } catch (err) {
+                          console.error(err);
+                          setCurrentImage(img.url);
+                          setHistory([img.url]);
+                          setHistoryIdx(0);
+                          setLoading(false);
+                        }
+                      }}
+                      style={{
+                        flex: '0 0 54px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <img
+                        src={img.url}
+                        alt={img.title}
+                        style={{ width: '40px', height: '40px', borderRadius: '4px', border: '1px solid var(--border-color)', objectFit: 'cover' }}
+                      />
+                      <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40px' }}>
+                        {img.title.split(' ')[0]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
