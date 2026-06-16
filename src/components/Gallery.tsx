@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { GalleryItem } from '../context/AppContext';
-import { Trash2, Download, Copy, Image, Check, Tag } from 'lucide-react';
+import { Trash2, Download, Copy, Image, Check, Tag, ArrowRight } from 'lucide-react';
 
 export const Gallery: React.FC = () => {
   const { gallery, deleteFromGallery, importToStudio } = useApp();
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [copySuccessId, setCopySuccessId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
   // Extract all unique tags
   const allTags = ['all', ...Array.from(new Set(gallery.flatMap(item => item.tags)))];
@@ -89,22 +90,25 @@ export const Gallery: React.FC = () => {
           )}
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
           {filteredGallery.map((item) => (
             <div
               key={item.id}
               className="glass-panel animate-fade-in"
+              onClick={() => setSelectedItem(item)}
               style={{
-                padding: '6px',
+                padding: '4px',
                 borderRadius: 'var(--radius-sm)',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 0,
-                transition: 'transform 0.3s, border-color 0.3s'
+                cursor: 'pointer',
+                border: '1px solid var(--border-color)',
+                transition: 'border-color 0.2s'
               }}
             >
               {/* Image Preview Box */}
-              <div style={{ position: 'relative', width: '100%', height: '100px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', borderRadius: 'var(--radius-xs)', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
                   src={item.dataUrl}
                   alt={item.title}
@@ -116,10 +120,10 @@ export const Gallery: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '4px',
-                    right: '4px',
-                    width: '8px',
-                    height: '8px',
+                    top: '3px',
+                    right: '3px',
+                    width: '6px',
+                    height: '6px',
                     borderRadius: '50%',
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
                     border: '1px solid #ffffff',
@@ -128,53 +132,124 @@ export const Gallery: React.FC = () => {
               </div>
 
               {/* Text metadata */}
-              <div style={{ padding: '4px 2px 0 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ padding: '3px 1px 1px 1px', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '0.65rem', fontWeight: 500, margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {item.title}
                 </h3>
-
-                {/* Card Operations */}
-                <div style={{ display: 'flex', gap: '4px', marginTop: 'auto' }}>
-                  <button
-                    className="btn btn-secondary"
-                    style={{ flex: '1.5', padding: '3px 0', fontSize: '0.7rem' }}
-                    onClick={() => importToStudio(item.dataUrl)}
-                  >
-                    编辑
-                  </button>
-
-                  <button
-                    className="btn btn-secondary"
-                    style={{ padding: '3px 5px' }}
-                    onClick={() => handleCopy(item)}
-                    title="复制"
-                  >
-                    {copySuccessId === item.id ? <Check style={{ width: 10, color: 'var(--success)' }} /> : <Copy style={{ width: 10 }} />}
-                  </button>
-
-                  <button
-                    className="btn btn-secondary"
-                    style={{ padding: '3px 5px' }}
-                    onClick={() => handleDownload(item)}
-                    title="下载"
-                  >
-                    <Download style={{ width: 10 }} />
-                  </button>
-
-                  <button
-                    className="btn btn-secondary"
-                    style={{ padding: '3px 5px', color: 'var(--danger)' }}
-                    onClick={() => handleDelete(item.id)}
-                    title="删除"
-                  >
-                    <Trash2 style={{ width: 10 }} />
-                  </button>
-                </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Bottom Sheet Drawer for Gallery Item Actions */}
+      {selectedItem && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+          onClick={() => setSelectedItem(null)}
+        >
+          <div
+            className="glass-panel animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: '600px',
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              margin: 0,
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              boxShadow: '0 -8px 24px rgba(0,0,0,0.5)',
+              borderTop: '1px solid var(--border-color)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header info */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14', flexShrink: 0 }}>
+                <img src={selectedItem.dataUrl} alt={selectedItem.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedItem.title}</h3>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                  分类标签: {itemTagsDisplay(selectedItem)}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions list */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '0.65rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                onClick={() => {
+                  importToStudio(selectedItem.dataUrl);
+                  setSelectedItem(null);
+                }}
+              >
+                <span>🎨 导入画室编辑</span>
+                <ArrowRight style={{ width: 14 }} />
+              </button>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ flex: 1, padding: '0.6rem 0', fontSize: '0.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}
+                  onClick={() => handleCopy(selectedItem)}
+                >
+                  {copySuccessId === selectedItem.id ? <Check style={{ width: 14, color: 'var(--success)' }} /> : <Copy style={{ width: 14 }} />}
+                  <span>{copySuccessId === selectedItem.id ? '已复制' : '复制图片'}</span>
+                </button>
+
+                <button
+                  className="btn btn-secondary"
+                  style={{ flex: 1, padding: '0.6rem 0', fontSize: '0.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}
+                  onClick={() => handleDownload(selectedItem)}
+                >
+                  <Download style={{ width: 14 }} />
+                  <span>下载</span>
+                </button>
+              </div>
+
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', padding: '0.65rem', fontSize: '0.75rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)', background: 'rgba(239, 68, 68, 0.02)' }}
+                onClick={() => {
+                  handleDelete(selectedItem.id);
+                  setSelectedItem(null);
+                }}
+              >
+                <Trash2 style={{ width: 14, marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }} />
+                <span>从本地库删除</span>
+              </button>
+
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', padding: '0.6rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}
+                onClick={() => setSelectedItem(null)}
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+// Helper inside the file to format tags display
+function itemTagsDisplay(item: GalleryItem) {
+  if (!item.tags || item.tags.length === 0) return '无';
+  return item.tags.map(t => `#${t}`).join(', ');
+}

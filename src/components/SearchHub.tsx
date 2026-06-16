@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { PRESET_IMAGES } from '../data/presets';
-import { Search, Upload, RefreshCw, Sliders, Heart, Check, Trash2 } from 'lucide-react';
+import { Search, Upload, RefreshCw, Sliders, Heart, Check, Trash2, Download, ArrowRight } from 'lucide-react';
 
 // Combined item interface for rendering
 interface SearchResultItem {
@@ -21,6 +21,7 @@ export const SearchHub: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [selectedItem, setSelectedItem] = useState<SearchResultItem | null>(null);
   
   // Color Search State
   const [selectedColor, setSelectedColor] = useState<{ r: number; g: number; b: number } | null>(null);
@@ -403,23 +404,26 @@ export const SearchHub: React.FC = () => {
           <span>暂无图片数据。请输入其他关键词，或者在右上角切换至“内置与本地图库”！</span>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
           {sortedResults.map((item) => (
             <div
               key={item.id}
               className="glass-panel animate-fade-in"
+              onClick={() => setSelectedItem(item)}
               style={{
-                padding: '6px',
+                padding: '4px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 margin: 0,
-                transition: 'transform 0.3s, border-color 0.3s',
+                cursor: 'pointer',
+                border: '1px solid var(--border-color)',
+                transition: 'border-color 0.2s',
               }}
             >
               {/* Image Box */}
-              <div style={{ position: 'relative', width: '100%', height: '100px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', borderRadius: 'var(--radius-xs)', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
                   src={item.url}
                   alt={item.title}
@@ -429,7 +433,7 @@ export const SearchHub: React.FC = () => {
                 
                 {/* Labels & Tags */}
                 {item.isPreset && (
-                  <span style={{ position: 'absolute', top: '4px', left: '4px', background: 'var(--primary)', color: '#fff', fontSize: '0.6rem', fontWeight: 600, padding: '1px 4px', borderRadius: '3px' }}>
+                  <span style={{ position: 'absolute', top: '3px', left: '3px', background: 'var(--primary)', color: '#fff', fontSize: '0.55rem', fontWeight: 600, padding: '1px 3px', borderRadius: '2px' }}>
                     内置
                   </span>
                 )}
@@ -438,10 +442,10 @@ export const SearchHub: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '4px',
-                    right: '4px',
-                    width: '8px',
-                    height: '8px',
+                    top: '3px',
+                    right: '3px',
+                    width: '6px',
+                    height: '6px',
                     borderRadius: '50%',
                     backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
                     border: '1px solid #ffffff',
@@ -450,32 +454,113 @@ export const SearchHub: React.FC = () => {
               </div>
 
               {/* Text Meta */}
-              <div style={{ padding: '4px 2px 0 2px', flex: '1', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ padding: '3px 1px 1px 1px', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '0.65rem', fontWeight: 500, margin: 0, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {item.title}
                 </h3>
-
-                {/* Card Action Buttons */}
-                <div style={{ display: 'flex', gap: '4px', marginTop: 'auto' }}>
-                  <button
-                    className="btn btn-secondary"
-                    style={{ flex: '1', padding: '3px 0', fontSize: '0.7rem' }}
-                    onClick={() => handleImportToStudio(item)}
-                  >
-                    编辑
-                  </button>
-                  <button
-                    className={`btn ${savedIds[item.id] ? 'btn-secondary' : 'btn-primary'}`}
-                    style={{ padding: '3px 6px', color: savedIds[item.id] ? 'var(--success)' : '' }}
-                    onClick={() => handleSaveToGallery(item)}
-                    disabled={savedIds[item.id] || loading}
-                  >
-                    {savedIds[item.id] ? <Check style={{ width: 10 }} /> : <Heart style={{ width: 10 }} />}
-                  </button>
-                </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Bottom Sheet Drawer for Item Actions */}
+      {selectedItem && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+          onClick={() => setSelectedItem(null)}
+        >
+          <div
+            className="glass-panel animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: '600px',
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              margin: 0,
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              boxShadow: '0 -8px 24px rgba(0,0,0,0.5)',
+              borderTop: '1px solid var(--border-color)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header info */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#0a0a14', flexShrink: 0 }}>
+                <img src={selectedItem.url} alt={selectedItem.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedItem.title}</h3>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                  {selectedItem.isPreset ? '内置矢量图' : '在线图片资源'}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions list */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '0.65rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                onClick={() => {
+                  handleImportToStudio(selectedItem);
+                  setSelectedItem(null);
+                }}
+              >
+                <span>🎨 导入画室编辑</span>
+                <ArrowRight style={{ width: 14 }} />
+              </button>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className={`btn ${savedIds[selectedItem.id] ? 'btn-secondary' : 'btn-primary'}`}
+                  style={{ flex: 1.2, padding: '0.6rem 0', fontSize: '0.75rem', color: savedIds[selectedItem.id] ? 'var(--success)' : '' }}
+                  onClick={() => {
+                    handleSaveToGallery(selectedItem);
+                    // Do not close drawer, user can see saved success feedback!
+                  }}
+                  disabled={savedIds[selectedItem.id]}
+                >
+                  {savedIds[selectedItem.id] ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
+                  <span>{savedIds[selectedItem.id] ? '已收藏' : '收藏图片'}</span>
+                </button>
+
+                <button
+                  className="btn btn-secondary"
+                  style={{ flex: 0.8, padding: '0.6rem 0', fontSize: '0.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = selectedItem.url;
+                    link.download = `search_${selectedItem.title.replace(/\s+/g, '_')}.png`;
+                    link.click();
+                  }}
+                >
+                  <Download style={{ width: 14 }} />
+                  <span>下载</span>
+                </button>
+              </div>
+
+              <button
+                className="btn btn-secondary"
+                style={{ width: '100%', padding: '0.6rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}
+                onClick={() => setSelectedItem(null)}
+              >
+                取消
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

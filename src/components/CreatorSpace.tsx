@@ -465,19 +465,22 @@ export const CreatorSpace: React.FC = () => {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '3rem' }}>
-      {/* Header operations */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      {/* Unified Header with Back Button and Upload on the right */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginTop: 0 }}>
         <button 
           className="btn btn-secondary" 
-          style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', display: 'inline-flex', gap: '6px' }} 
+          style={{ width: '28px', height: '28px', padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
           onClick={() => setActiveSubTool('none')}
+          title="返回工坊"
         >
           <ArrowLeft style={{ width: 14 }} />
-          返回工坊
         </button>
+        <span style={{ fontSize: '1rem', fontWeight: 800, background: 'linear-gradient(to right, var(--text-primary), #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          创意画坊
+        </span>
 
         {/* Compact Upload Button */}
-        <div>
+        <div style={{ marginLeft: 'auto' }}>
           <input
             type="file"
             accept="image/*"
@@ -485,15 +488,11 @@ export const CreatorSpace: React.FC = () => {
             onChange={handleFileUpload}
             style={{ display: 'none' }}
           />
-          <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'inline-flex', gap: '4px' }} onClick={() => fileInputRef.current?.click()}>
-            <Upload style={{ width: 14 }} />
+          <button className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.7rem', display: 'inline-flex', gap: '4px' }} onClick={() => fileInputRef.current?.click()}>
+            <Upload style={{ width: 12 }} />
             上传底图
           </button>
         </div>
-      </div>
-
-      <div className="page-header" style={{ marginTop: 0 }}>
-        <h1 className="page-title">创意画坊</h1>
       </div>
 
       {/* Segmented Selector for Sub-Tools */}

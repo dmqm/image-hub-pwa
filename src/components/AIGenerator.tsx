@@ -224,17 +224,18 @@ export const AIGenerator: React.FC = () => {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '3rem' }}>
-      <button 
-        className="btn btn-secondary" 
-        style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.25rem', display: 'inline-flex', gap: '6px' }} 
-        onClick={() => setActiveSubTool('none')}
-      >
-        <ArrowLeft style={{ width: 14 }} />
-        返回工坊
-      </button>
-
-      <div className="page-header" style={{ marginTop: 0 }}>
-        <h1 className="page-title">AI 生图</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginTop: 0 }}>
+        <button 
+          className="btn btn-secondary" 
+          style={{ width: '28px', height: '28px', padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+          onClick={() => setActiveSubTool('none')}
+          title="返回工坊"
+        >
+          <ArrowLeft style={{ width: 14 }} />
+        </button>
+        <span style={{ fontSize: '1rem', fontWeight: 800, background: 'linear-gradient(to right, var(--text-primary), #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          AI 生图
+        </span>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
