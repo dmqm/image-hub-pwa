@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { RotateCw, FlipHorizontal, FlipVertical, Undo, Redo, Download, Heart, Check, Trash2, Edit2 } from 'lucide-react';
+import { RotateCw, FlipHorizontal, FlipVertical, Undo, Redo, Download, Heart, Check, Trash2, Edit2, ArrowLeft } from 'lucide-react';
 
 interface FilterPreset {
   name: string;
@@ -20,7 +20,7 @@ const FILTER_PRESETS: FilterPreset[] = [
 ];
 
 export const Studio: React.FC = () => {
-  const { currentImage, setCurrentImage, addToGallery } = useApp();
+  const { currentImage, setCurrentImage, addToGallery, setActiveSubTool } = useApp();
 
   // Settings
   const [brightness, setBrightness] = useState(100);
@@ -278,17 +278,37 @@ export const Studio: React.FC = () => {
   };
 
   // Drawing Functionality
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>, canvas: HTMLCanvasElement) => {
+    const rect = canvas.getBoundingClientRect();
+    let clientX: number;
+    let clientY: number;
+
+    if ('touches' in e) {
+      if (e.touches.length === 0) return null;
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const x = ((clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((clientY - rect.top) / rect.height) * canvas.height;
+    return { x, y };
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (activeTool !== 'draw') return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    // Scale coords to actual canvas resolution
-    const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
-    const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+    const coords = getCoordinates(e, canvas);
+    if (!coords) return;
 
     ctx.save();
     ctx.strokeStyle = brushColor;
@@ -296,22 +316,24 @@ export const Studio: React.FC = () => {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(x, y);
+    ctx.moveTo(coords.x, coords.y);
     setIsDrawing(true);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing || activeTool !== 'draw') return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
-    const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+    const coords = getCoordinates(e, canvas);
+    if (!coords) return;
 
-    ctx.lineTo(x, y);
+    ctx.lineTo(coords.x, coords.y);
     ctx.stroke();
   };
 
@@ -386,226 +408,243 @@ export const Studio: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      <div className="page-header">
-        <h1 className="page-title">图像处理 Studio</h1>
-        <p className="page-subtitle">强大的画布引擎，支持基础微调、创意滤镜、自由旋转、涂鸦绘画</p>
+    <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '3rem' }}>
+      <button 
+        className="btn btn-secondary" 
+        style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.25rem', display: 'inline-flex', gap: '6px' }} 
+        onClick={() => setActiveSubTool('none')}
+      >
+        <ArrowLeft style={{ width: 14 }} />
+        返回工坊
+      </button>
+
+      <div className="page-header" style={{ marginTop: 0 }}>
+        <h1 className="page-title">画室 Studio</h1>
+        <p className="page-subtitle">强大的画布引擎，支持基础微调、创意滤镜、自由旋转与涂鸦</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2rem', alignItems: 'start' }}>
-        {/* Left canvas and global tools */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          
-          {/* Main display panel */}
-          <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '420px', margin: 0 }}>
-            {currentImage ? (
-              <div
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Canvas Display Area */}
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '340px', margin: 0, padding: '1.25rem' }}>
+          {currentImage ? (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxHeight: '320px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: activeTool === 'draw' ? 'crosshair' : 'default',
+                overflow: 'hidden'
+              }}
+            >
+              <canvas
+                ref={canvasRef}
+                onMouseDown={startDrawing}
+                onMouseMove={draw}
+                onMouseUp={stopDrawing}
+                onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  maxHeight: '440px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  cursor: activeTool === 'draw' ? 'crosshair' : 'default',
-                  overflow: 'hidden'
+                  maxWidth: '100%',
+                  maxHeight: '300px',
+                  borderRadius: 'var(--radius-sm)',
+                  boxShadow: 'var(--shadow-glass)',
+                  background: '#0a0a14',
+                  objectFit: 'contain'
                 }}
-              >
-                <canvas
-                  ref={canvasRef}
-                  onMouseDown={startDrawing}
-                  onMouseMove={draw}
-                  onMouseUp={stopDrawing}
-                  onMouseLeave={stopDrawing}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '420px',
-                    borderRadius: 'var(--radius-sm)',
-                    boxShadow: 'var(--shadow-glass)',
-                    background: '#0a0a14',
-                    objectFit: 'contain'
-                  }}
-                />
+              />
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 1rem' }}>
+              <Edit2 style={{ width: 36, height: 36 }} />
+              <div>
+                <h3 style={{ color: 'var(--text-secondary)', marginBottom: '6px', fontSize: '0.95rem' }}>Studio 编辑区为空</h3>
+                <p style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>您可以上传一张本地图片，或从“搜图中心”、“AI生图”将图片导入此处编辑</p>
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 1rem' }}>
-                <Edit2 style={{ width: 44, height: 44 }} />
-                <div>
-                  <h3 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Studio 编辑区为空</h3>
-                  <p style={{ fontSize: '0.85rem' }}>您可以上传一张本地图片，或从“搜图中心”、“AI生图”将图片导入此处编辑</p>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
-                <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()}>
-                  上传本地图片
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+              />
+              <button className="btn btn-primary" style={{ padding: '0.65rem 1rem', fontSize: '0.8rem' }} onClick={() => fileInputRef.current?.click()}>
+                上传本地图片
+              </button>
+            </div>
+          )}
+
+          {/* Quick action buttons below canvas */}
+          {currentImage && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '1.25rem', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+              {/* Operations Row */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleUndo} disabled={historyIdx <= 0} title="撤销">
+                  <Undo style={{ width: 14 }} />
+                </button>
+                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleRedo} disabled={historyIdx >= history.length - 1} title="重做">
+                  <Redo style={{ width: 14 }} />
+                </button>
+                
+                <div style={{ width: '1px', height: '18px', background: 'var(--border-color)' }} />
+                
+                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={handleRotate} title="旋转 90 度">
+                  <RotateCw style={{ width: 14 }} />
+                </button>
+                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={() => handleFlip('h')} title="水平翻转">
+                  <FlipHorizontal style={{ width: 14 }} />
+                </button>
+                <button className="btn btn-secondary" style={{ padding: '8px 12px' }} onClick={() => handleFlip('v')} title="垂直翻转">
+                  <FlipVertical style={{ width: 14 }} />
+                </button>
+
+                <div style={{ width: '1px', height: '18px', background: 'var(--border-color)' }} />
+                
+                <button className="btn btn-secondary" style={{ padding: '8px 12px', color: 'var(--danger)' }} onClick={handleClearCanvas} title="清空全部更改">
+                  <Trash2 style={{ width: 14 }} />
                 </button>
               </div>
-            )}
 
-            {/* Quick action buttons below canvas */}
-            {currentImage && (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '1.5rem', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
-                <button className="btn btn-secondary" onClick={handleUndo} disabled={historyIdx <= 0} title="撤销">
-                  <Undo style={{ width: 16 }} />
-                </button>
-                <button className="btn btn-secondary" onClick={handleRedo} disabled={historyIdx >= history.length - 1} title="重做">
-                  <Redo style={{ width: 16 }} />
-                </button>
-                
-                <div style={{ width: '1px', background: 'var(--border-color)', margin: '0 8px' }} />
-                
-                <button className="btn btn-secondary" onClick={handleRotate} title="旋转 90 度">
-                  <RotateCw style={{ width: 16 }} />
-                </button>
-                <button className="btn btn-secondary" onClick={() => handleFlip('h')} title="水平翻转">
-                  <FlipHorizontal style={{ width: 16 }} />
-                </button>
-                <button className="btn btn-secondary" onClick={() => handleFlip('v')} title="垂直翻转">
-                  <FlipVertical style={{ width: 16 }} />
-                </button>
-
-                <div style={{ width: '1px', background: 'var(--border-color)', margin: '0 8px' }} />
-                
-                <button className="btn btn-secondary" onClick={handleClearCanvas} style={{ color: 'var(--danger)' }} title="清空全部更改">
-                  <Trash2 style={{ width: 16 }} />
-                </button>
-
-                <div style={{ flex: 1 }} />
-
-                <button className="btn btn-secondary" onClick={handleDownload}>
-                  <Download style={{ width: 16 }} />
-                  导出
+              {/* Save & Export Row */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button className="btn btn-secondary" style={{ flex: 1, padding: '0.65rem', fontSize: '0.8rem' }} onClick={handleDownload}>
+                  <Download style={{ width: 14 }} />
+                  导出图片
                 </button>
                 <button
                   className={`btn ${saveSuccess ? 'btn-secondary' : 'btn-primary'}`}
-                  style={{ color: saveSuccess ? 'var(--success)' : '' }}
+                  style={{ flex: 1.2, padding: '0.65rem', fontSize: '0.8rem', color: saveSuccess ? 'var(--success)' : '' }}
                   onClick={handleSaveToGallery}
                   disabled={loading}
                 >
-                  {saveSuccess ? <Check style={{ width: 16 }} /> : <Heart style={{ width: 16 }} />}
-                  {saveSuccess ? '已收藏' : '收藏'}
+                  {saveSuccess ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
+                  <span>{saveSuccess ? '已保存至画廊' : '保存至画廊'}</span>
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Settings panel */}
-        <div className="glass-panel" style={{ height: '100%', margin: 0, minHeight: '420px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Sub tabs */}
+        {/* Settings Panel */}
+        <div className="glass-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Sub Tabs */}
           <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)' }}>
             <button
               className={`btn ${activeTool === 'adjust' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.8rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('adjust')}
             >
               基础调节
             </button>
             <button
               className={`btn ${activeTool === 'filter' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.8rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('filter')}
             >
               艺术滤镜
             </button>
             <button
               className={`btn ${activeTool === 'draw' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ flex: 1, padding: '6px 0', fontSize: '0.8rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+              style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
               onClick={() => setActiveTool('draw')}
             >
               涂鸦绘画
             </button>
           </div>
 
-          <div style={{ flex: 1 }}>
-            {/* 1. Adjustment panel */}
+          <div style={{ minHeight: '120px' }}>
+            {/* 1. Adjustment Panel */}
             {activeTool === 'adjust' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>亮度 (Brightness)</span>
                     <span>{brightness}%</span>
                   </label>
-                  <input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} disabled={!currentImage} />
+                  <input type="range" min="0" max="200" value={brightness} onChange={(e) => setBrightness(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} disabled={!currentImage} />
                 </div>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>对比度 (Contrast)</span>
                     <span>{contrast}%</span>
                   </label>
-                  <input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} disabled={!currentImage} />
+                  <input type="range" min="0" max="200" value={contrast} onChange={(e) => setContrast(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} disabled={!currentImage} />
                 </div>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>饱和度 (Saturation)</span>
                     <span>{saturation}%</span>
                   </label>
-                  <input type="range" min="0" max="200" value={saturation} onChange={(e) => setSaturation(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} disabled={!currentImage} />
+                  <input type="range" min="0" max="200" value={saturation} onChange={(e) => setSaturation(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} disabled={!currentImage} />
                 </div>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>模糊 (Blur)</span>
                     <span>{blur}px</span>
                   </label>
-                  <input type="range" min="0" max="20" step="0.5" value={blur} onChange={(e) => setBlur(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)' }} disabled={!currentImage} />
+                  <input type="range" min="0" max="20" step="0.5" value={blur} onChange={(e) => setBlur(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} disabled={!currentImage} />
                 </div>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>色相旋转 (Hue Rotate)</span>
                     <span>{hueRotate}°</span>
                   </label>
-                  <input type="range" min="0" max="360" value={hueRotate} onChange={(e) => setHueRotate(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} disabled={!currentImage} />
+                  <input type="range" min="0" max="360" value={hueRotate} onChange={(e) => setHueRotate(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} disabled={!currentImage} />
                 </div>
               </div>
             )}
 
-            {/* 2. Filter panel */}
+            {/* 2. Filter Panel */}
             {activeTool === 'filter' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                {/* Horizontal Scroll list for Filters */}
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px', WebkitOverflowScrolling: 'touch' }}>
                   {FILTER_PRESETS.map((filter) => (
                     <div
                       key={filter.name}
                       onClick={() => currentImage && setSelectedFilter(filter)}
                       style={{
-                        padding: '10px',
-                        borderRadius: 'var(--radius-md)',
+                        flex: '0 0 85px',
+                        padding: '8px 4px',
+                        borderRadius: 'var(--radius-sm)',
                         background: selectedFilter.name === filter.name ? 'var(--primary-glow)' : 'var(--bg-input)',
                         border: `1px solid ${selectedFilter.name === filter.name ? 'var(--primary)' : 'var(--border-color)'}`,
                         cursor: currentImage ? 'pointer' : 'not-allowed',
-                        fontSize: '0.8rem',
+                        fontSize: '0.7rem',
                         fontWeight: 600,
                         textAlign: 'center',
                         opacity: currentImage ? 1 : 0.5,
-                        transition: 'var(--transition-smooth)'
+                        transition: 'var(--transition-smooth)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
                       }}
                     >
-                      {filter.name}
+                      {filter.name.split(' ')[0]}
                     </div>
                   ))}
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                     <input
                       type="checkbox"
                       id="chk-pixelate"
                       checked={pixelate}
                       onChange={(e) => currentImage && setPixelate(e.target.checked)}
-                      style={{ accentColor: 'var(--primary)', width: 16, height: 16 }}
+                      style={{ accentColor: 'var(--primary)', width: 14, height: 14 }}
                       disabled={!currentImage}
                     />
-                    <label htmlFor="chk-pixelate" className="input-label" style={{ cursor: 'pointer', margin: 0 }}>启用像素画滤镜 (Pixelate)</label>
+                    <label htmlFor="chk-pixelate" className="input-label" style={{ cursor: 'pointer', margin: 0, fontSize: '0.75rem' }}>启用像素画滤镜 (Pixelate)</label>
                   </div>
                   {pixelate && (
-                    <div className="input-group animate-fade-in" style={{ margin: 0 }}>
-                      <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>像素块尺寸 (Pixel Size)</span>
+                    <div className="input-group animate-fade-in" style={{ margin: 0, gap: '4px' }}>
+                      <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                        <span>像素块尺寸</span>
                         <span>{pixelSize}px</span>
                       </label>
                       <input type="range" min="4" max="30" step="1" value={pixelSize} onChange={(e) => setPixelSize(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
@@ -615,22 +654,24 @@ export const Studio: React.FC = () => {
               </div>
             )}
 
-            {/* 3. Drawing panel */}
+            {/* 3. Drawing Panel */}
             {activeTool === 'draw' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label">画笔颜色 (Brush Color)</label>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                <div className="input-group" style={{ margin: 0, gap: '6px' }}>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>画笔颜色 (Brush Color)</label>
+                  {/* Horizontal Scroll for Colors */}
+                  <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px', WebkitOverflowScrolling: 'touch' }}>
                     {['#6366f1', '#a855f7', '#14b8a6', '#ef4444', '#10b981', '#f59e0b', '#ffffff', '#000000'].map((color) => (
                       <div
                         key={color}
                         onClick={() => setBrushColor(color)}
                         style={{
-                          width: '24px',
-                          height: '24px',
+                          width: '20px',
+                          height: '20px',
                           borderRadius: '50%',
                           backgroundColor: color,
                           cursor: 'pointer',
+                          flexShrink: 0,
                           border: brushColor === color ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.2)',
                           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
                           transform: brushColor === color ? 'scale(1.15)' : 'none'
@@ -638,25 +679,14 @@ export const Studio: React.FC = () => {
                       />
                     ))}
                   </div>
-                  <input
-                    type="color"
-                    className="input-field"
-                    style={{ padding: '2px', height: '36px', width: '100%', cursor: 'pointer' }}
-                    value={brushColor}
-                    onChange={(e) => setBrushColor(e.target.value)}
-                  />
                 </div>
 
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
                     <span>画笔粗细 (Brush Width)</span>
                     <span>{brushWidth}px</span>
                   </label>
                   <input type="range" min="1" max="50" step="1" value={brushWidth} onChange={(e) => setBrushWidth(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
-                </div>
-
-                <div style={{ background: 'var(--primary-glow)', border: '1px solid var(--primary)', padding: '10px 15px', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-                  ✏️ <b>使用说明：</b> 激活此标签后，用鼠标或手指直接在左侧画布上拖动即可开始手绘涂鸦。涂鸦记录会实时加入历史栈中，可以使用撤销按钮回滚。
                 </div>
               </div>
             )}

@@ -1,18 +1,15 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Search, Sparkles, Laugh, Palette, Sliders, Image, Settings } from 'lucide-react';
+import { Search, Palette, Image, Settings } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { activeTab, setActiveTab } = useApp();
 
   const navItems = [
-    { id: 'search', label: '搜图中心', icon: Search },
-    { id: 'ai', label: 'AI 生图', icon: Sparkles },
-    { id: 'meme', label: '表情包制作', icon: Laugh },
-    { id: 'creator', label: '创意画坊', icon: Palette },
-    { id: 'studio', label: '图像处理', icon: Sliders },
-    { id: 'gallery', label: '我的画廊', icon: Image },
-    { id: 'settings', label: '系统设置', icon: Settings },
+    { id: 'search', label: '搜图', icon: Search },
+    { id: 'tools', label: '工坊', icon: Palette },
+    { id: 'gallery', label: '画廊', icon: Image },
+    { id: 'settings', label: '设置', icon: Settings },
   ];
 
   return (

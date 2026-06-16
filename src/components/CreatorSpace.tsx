@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, Copy, Download, Heart, Check } from 'lucide-react';
+import { Upload, Copy, Download, Heart, Check, ArrowLeft } from 'lucide-react';
 
 
 interface AvatarFrame {
@@ -137,7 +137,7 @@ const AVATAR_FRAMES: AvatarFrame[] = [
 ];
 
 export const CreatorSpace: React.FC = () => {
-  const { currentImage, addToGallery } = useApp();
+  const { currentImage, addToGallery, setActiveSubTool } = useApp();
   
   const [activeTool, setActiveTool] = useState<'watermark' | 'quote' | 'avatar'>('watermark');
   const [uploadImg, setUploadImg] = useState<string | null>(null);
@@ -464,39 +464,19 @@ export const CreatorSpace: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      <div className="page-header">
-        <h1 className="page-title">创意设计坊</h1>
-        <p className="page-subtitle">水印声明、精美语录日签、个性社交头像框一键快速出图</p>
-      </div>
+    <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '3rem' }}>
+      {/* Header operations */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <button 
+          className="btn btn-secondary" 
+          style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', display: 'inline-flex', gap: '6px' }} 
+          onClick={() => setActiveSubTool('none')}
+        >
+          <ArrowLeft style={{ width: 14 }} />
+          返回工坊
+        </button>
 
-      {/* Toolbox selectors */}
-      <div className="glass-panel" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            className={`btn ${activeTool === 'watermark' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.55rem 1.25rem' }}
-            onClick={() => setActiveTool('watermark')}
-          >
-            图片加水印
-          </button>
-          <button
-            className={`btn ${activeTool === 'quote' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.55rem 1.25rem' }}
-            onClick={() => setActiveTool('quote')}
-          >
-            语录卡片/海报
-          </button>
-          <button
-            className={`btn ${activeTool === 'avatar' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.55rem 1.25rem' }}
-            onClick={() => setActiveTool('avatar')}
-          >
-            微信头像框
-          </button>
-        </div>
-
-        {/* Upload Button */}
+        {/* Compact Upload Button */}
         <div>
           <input
             type="file"
@@ -505,20 +485,50 @@ export const CreatorSpace: React.FC = () => {
             onChange={handleFileUpload}
             style={{ display: 'none' }}
           />
-          <button className="btn btn-secondary" onClick={() => fileInputRef.current?.click()}>
-            <Upload style={{ width: 16 }} />
-            上传底图图片
+          <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'inline-flex', gap: '4px' }} onClick={() => fileInputRef.current?.click()}>
+            <Upload style={{ width: 14 }} />
+            上传底图
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '2rem', alignItems: 'start' }}>
+      <div className="page-header" style={{ marginTop: 0 }}>
+        <h1 className="page-title">画坊与头像</h1>
+        <p className="page-subtitle">水印声明、精美语录卡片、个性社交头像框一键快速出图</p>
+      </div>
+
+      {/* Segmented Selector for Sub-Tools */}
+      <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)', marginBottom: '1.25rem' }}>
+        <button
+          className={`btn ${activeTool === 'watermark' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          onClick={() => setActiveTool('watermark')}
+        >
+          图片水印
+        </button>
+        <button
+          className={`btn ${activeTool === 'quote' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          onClick={() => setActiveTool('quote')}
+        >
+          语录卡片
+        </button>
+        <button
+          className={`btn ${activeTool === 'avatar' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ flex: 1, padding: '6px 0', fontSize: '0.75rem', borderRadius: '10px', boxShadow: 'none', border: 'none' }}
+          onClick={() => setActiveTool('avatar')}
+        >
+          社交头像框
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {/* Left Canvas Display */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', margin: 0, padding: '1.5rem' }}>
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '320px', margin: 0, padding: '1.25rem' }}>
           <div
             style={{
               width: '100%',
-              maxWidth: activeTool === 'quote' ? '300px' : '380px',
+              maxWidth: activeTool === 'quote' ? '240px' : '300px',
               background: '#07070d',
               border: '1px solid var(--border-color)',
               borderRadius: activeTool === 'avatar' ? '50%' : 'var(--radius-md)',
@@ -542,52 +552,52 @@ export const CreatorSpace: React.FC = () => {
           </div>
 
           {uploadImg && (
-            <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem', width: '100%', maxWidth: '380px' }}>
-              <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleCopyToClipboard} disabled={loading}>
-                {copySuccess ? <Check style={{ width: 16 }} /> : <Copy style={{ width: 16 }} />}
-                {copySuccess ? '已复制' : '复制到剪贴板'}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '1.25rem', width: '100%', maxWidth: '300px' }}>
+              <button className="btn btn-primary" style={{ flex: 1.2, padding: '0.65rem', fontSize: '0.8rem' }} onClick={handleCopyToClipboard} disabled={loading}>
+                {copySuccess ? <Check style={{ width: 14 }} /> : <Copy style={{ width: 14 }} />}
+                <span>{copySuccess ? '已复制' : '复制到剪贴板'}</span>
               </button>
-              <button className="btn btn-secondary" onClick={handleDownload} disabled={loading}>
-                <Download style={{ width: 16 }} />
+              <button className="btn btn-secondary" style={{ flex: '0.3', padding: '0.65rem' }} onClick={handleDownload} disabled={loading}>
+                <Download style={{ width: 14 }} />
               </button>
               <button
                 className="btn btn-secondary"
-                style={{ color: saveSuccess ? 'var(--success)' : '' }}
+                style={{ flex: '0.3', padding: '0.65rem', color: saveSuccess ? 'var(--success)' : '' }}
                 onClick={handleSaveToGallery}
                 disabled={loading}
               >
-                {saveSuccess ? <Check style={{ width: 16 }} /> : <Heart style={{ width: 16 }} />}
+                {saveSuccess ? <Check style={{ width: 14 }} /> : <Heart style={{ width: 14 }} />}
               </button>
             </div>
           )}
         </div>
 
         {/* Right Settings Panel */}
-        <div className="glass-panel" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div className="input-label" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '4px' }}>
+        <div className="glass-panel" style={{ margin: 0, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="input-label" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '6px', fontSize: '0.75rem', marginBottom: '2px' }}>
             🔨 创意参数调节
           </div>
 
           {/* 1. Watermark Form */}
           {activeTool === 'watermark' && (
-            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">水印文字</label>
-                <input type="text" className="input-field" value={wmText} onChange={(e) => setWmText(e.target.value)} />
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>水印文字</label>
+                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={wmText} onChange={(e) => setWmText(e.target.value)} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label">水印颜色</label>
-                  <input type="color" className="input-field" style={{ padding: '4px', height: '38px', width: '100%' }} value={wmColor} onChange={(e) => setWmColor(e.target.value)} />
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>水印颜色</label>
+                  <input type="color" className="input-field" style={{ padding: '3px', height: '36px', width: '100%', cursor: 'pointer' }} value={wmColor} onChange={(e) => setWmColor(e.target.value)} />
                 </div>
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label">排版样式</label>
+                <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>排版样式</label>
                   <select
                     className="input-field"
                     value={wmStyle}
                     onChange={(e: any) => setWmStyle(e.target.value)}
-                    style={{ background: 'var(--bg-input)' }}
+                    style={{ background: 'var(--bg-input)', padding: '0.65rem', fontSize: '0.85rem' }}
                   >
                     <option value="tiled">全屏铺满平铺</option>
                     <option value="single">单行中心水印</option>
@@ -595,76 +605,91 @@ export const CreatorSpace: React.FC = () => {
                 </div>
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">透明度 ({Math.round(wmOpacity * 100)}%)</label>
-                <input type="range" min="0.05" max="1" step="0.05" value={wmOpacity} onChange={(e) => setWmOpacity(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>透明度</span>
+                  <span>{Math.round(wmOpacity * 100)}%</span>
+                </label>
+                <input type="range" min="0.05" max="1" step="0.05" value={wmOpacity} onChange={(e) => setWmOpacity(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">字体大小 ({wmSize}px)</label>
-                <input type="range" min="10" max="80" step="1" value={wmSize} onChange={(e) => setWmSize(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>字体大小</span>
+                  <span>{wmSize}px</span>
+                </label>
+                <input type="range" min="10" max="80" step="1" value={wmSize} onChange={(e) => setWmSize(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">旋转角度 ({wmAngle}°)</label>
-                <input type="range" min="-90" max="90" step="5" value={wmAngle} onChange={(e) => setWmAngle(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>旋转角度</span>
+                  <span>{wmAngle}°</span>
+                </label>
+                <input type="range" min="-90" max="90" step="5" value={wmAngle} onChange={(e) => setWmAngle(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} />
               </div>
             </div>
           )}
 
           {/* 2. Quote Card Form */}
           {activeTool === 'quote' && (
-            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">语录顶标 (Header)</label>
-                <input type="text" className="input-field" value={quoteHeader} onChange={(e) => setQuoteHeader(e.target.value)} />
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>语录顶标 (Header)</label>
+                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={quoteHeader} onChange={(e) => setQuoteHeader(e.target.value)} />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">语录内容</label>
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>语录内容</label>
                 <textarea
                   className="input-field"
-                  style={{ height: '70px', resize: 'none' }}
+                  style={{ height: '60px', resize: 'none', padding: '0.5rem 0.75rem', fontSize: '0.85rem', lineHeight: '1.4' }}
                   value={quoteContent}
                   onChange={(e) => setQuoteContent(e.target.value)}
                 />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">作者/出处</label>
-                <input type="text" className="input-field" value={quoteAuthor} onChange={(e) => setQuoteAuthor(e.target.value)} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>作者/出处</label>
+                <input type="text" className="input-field" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }} value={quoteAuthor} onChange={(e) => setQuoteAuthor(e.target.value)} />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">背景模糊度 ({bgBlur}px)</label>
-                <input type="range" min="0" max="40" step="1" value={bgBlur} onChange={(e) => setBgBlur(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>背景模糊度</span>
+                  <span>{bgBlur}px</span>
+                </label>
+                <input type="range" min="0" max="40" step="1" value={bgBlur} onChange={(e) => setBgBlur(parseInt(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} />
               </div>
 
-              <div className="input-group" style={{ margin: 0 }}>
-                <label className="input-label">卡片玻璃透明度 ({Math.round(cardOpacity * 100)}%)</label>
-                <input type="range" min="0.05" max="0.8" step="0.05" value={cardOpacity} onChange={(e) => setCardOpacity(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)' }} />
+              <div className="input-group" style={{ margin: 0, gap: '4px' }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>卡片透明度</span>
+                  <span>{Math.round(cardOpacity * 100)}%</span>
+                </label>
+                <input type="range" min="0.05" max="0.8" step="0.05" value={cardOpacity} onChange={(e) => setCardOpacity(parseFloat(e.target.value))} style={{ accentColor: 'var(--primary)', height: '18px' }} />
               </div>
             </div>
           )}
 
           {/* 3. Avatar Frame Form */}
           {activeTool === 'avatar' && (
-            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <label className="input-label">选择社交头像框挂件</label>
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <label className="input-label" style={{ fontSize: '0.75rem' }}>选择社交头像框挂件</label>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {AVATAR_FRAMES.map((frame) => (
                   <div
                     key={frame.id}
                     onClick={() => setSelectedFrame(frame)}
                     style={{
-                      padding: '12px',
-                      borderRadius: 'var(--radius-md)',
+                      padding: '10px 12px',
+                      borderRadius: 'var(--radius-sm)',
                       background: selectedFrame.id === frame.id ? 'var(--primary-glow)' : 'var(--bg-input)',
                       border: `1px solid ${selectedFrame.id === frame.id ? 'var(--primary)' : 'var(--border-color)'}`,
                       cursor: 'pointer',
                       fontWeight: 600,
-                      fontSize: '0.85rem',
+                      fontSize: '0.8rem',
                       transition: 'var(--transition-smooth)'
                     }}
                   >
@@ -673,15 +698,15 @@ export const CreatorSpace: React.FC = () => {
                 ))}
               </div>
 
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 15px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                💡 <b>提示：</b> 头像生成器会自动将上传的图片进行圆形高精剪裁，并精确叠加上述个性框饰。制作完成后点击复制即可粘贴发送！
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                💡 <b>提示：</b> 头像生成器会自动将上传的图片进行圆形剪裁，并叠加上述挂件。制作完成后点击复制即可保存！
               </div>
             </div>
           )}
 
           {!uploadImg && (
-            <div className="animate-fade-in" style={{ padding: '2rem', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <span>请上传一张图片，或在“我的画廊”和“搜图中心”中选择图片点击“导入编辑”来加载底图。</span>
+            <div className="animate-fade-in" style={{ padding: '1.5rem', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+              <span>请上传底图，或在“搜图”及“画廊”中点击“导入编辑”加载底图图片。</span>
             </div>
           )}
         </div>

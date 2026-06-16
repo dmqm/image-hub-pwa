@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Laugh, Copy, Download, Heart, Check, Plus, Trash2, Move } from 'lucide-react';
+import { Laugh, Copy, Download, Heart, Check, Plus, Trash2, Move, ArrowLeft } from 'lucide-react';
 
 interface MemeTemplate {
   id: string;
@@ -121,7 +121,7 @@ const MEME_TEMPLATES: MemeTemplate[] = [
 ];
 
 export const MemeMaker: React.FC = () => {
-  const { addToGallery, currentImage } = useApp();
+  const { addToGallery, currentImage, setActiveSubTool } = useApp();
   
   const [selectedTemplate, setSelectedTemplate] = useState<MemeTemplate>(MEME_TEMPLATES[0]);
   const [texts, setTexts] = useState<MemeText[]>([]);
@@ -536,16 +536,25 @@ export const MemeMaker: React.FC = () => {
   const selectedSticker = stickers.find(s => s.id === selectedStickerId);
 
   return (
-    <div className="animate-fade-in">
-      <div className="page-header">
+    <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '3rem' }}>
+      <button 
+        className="btn btn-secondary" 
+        style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.25rem', display: 'inline-flex', gap: '6px' }} 
+        onClick={() => setActiveSubTool('none')}
+      >
+        <ArrowLeft style={{ width: 14 }} />
+        返回工坊
+      </button>
+
+      <div className="page-header" style={{ marginTop: 0 }}>
         <h1 className="page-title">表情包工坊 (iOS Pro)</h1>
-        <p className="page-subtitle">直接拖拽移动文字与贴纸，个性配置字号色调，聊天秒复制直发</p>
+        <p className="page-subtitle">直接拖拽/触摸 Canvas 移动文字与贴纸，聊天秒复制直发</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         
-        {/* Left Interactive Canvas Panel */}
-        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: 0, padding: '1.5rem' }}>
+        {/* Canvas Panel */}
+        <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: 0, padding: '1.25rem' }}>
           
           {/* Canvas Wrapper */}
           <div
@@ -596,178 +605,178 @@ export const MemeMaker: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Settings and Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* 1. Preset Templates (Horizontal Scroll) */}
+        <div className="glass-panel" style={{ margin: 0, padding: '1rem 1.25rem' }}>
+          <div className="input-label" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Laugh style={{ width: 16, color: 'var(--primary)' }} />
+            切换底图模板
+          </div>
           
-          {/* 1. Active Element Customizer */}
-          <div className="glass-panel" style={{ margin: 0 }}>
-            <div className="input-label" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
-              🛠️ 选定图层调节
-            </div>
-
-            {selectedText ? (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700 }}>[文字图层]</span>
-                  <button className="btn btn-secondary" style={{ padding: '2px 8px', fontSize: '0.7rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDeleteText(selectedText.id)}>
-                    <Trash2 style={{ width: 12, marginRight: 2 }} /> 删除文字
-                  </button>
-                </div>
-                
-                <input
-                  type="text"
-                  className="input-field"
-                  value={selectedText.text}
-                  onChange={(e) => handleUpdateTextValue(selectedText.id, { text: e.target.value })}
+          <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
+            {currentImage && (
+              <div
+                onClick={() => {
+                  setSelectedTemplate({
+                    id: 'imported_image',
+                    name: '导入的自定义图片',
+                    layout: 'top-bottom',
+                    defaultText: '自定义文本',
+                    svg: ''
+                  });
+                }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px',
+                  borderRadius: 'var(--radius-md)',
+                  background: selectedTemplate.id === 'imported_image' ? 'var(--primary-glow)' : 'var(--bg-input)',
+                  border: `1px solid ${selectedTemplate.id === 'imported_image' ? 'var(--primary)' : 'var(--border-color)'}`,
+                  borderStyle: 'dashed',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  minWidth: '95px',
+                  flexShrink: 0,
+                  transition: 'var(--transition-smooth)'
+                }}
+              >
+                <img
+                  src={currentImage}
+                  alt="Imported"
+                  style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }}
                 />
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div className="input-group" style={{ margin: 0 }}>
-                    <label className="input-label" style={{ fontSize: '0.75rem' }}>文字颜色</label>
-                    <input type="color" className="input-field" style={{ padding: '2px', height: '36px', width: '100%' }} value={selectedText.color} onChange={(e) => handleUpdateTextValue(selectedText.id, { color: e.target.value })} />
-                  </div>
-                  <div className="input-group" style={{ margin: 0 }}>
-                    <label className="input-label" style={{ fontSize: '0.75rem' }}>描边颜色</label>
-                    <input type="color" className="input-field" style={{ padding: '2px', height: '36px', width: '100%' }} value={selectedText.strokeColor} onChange={(e) => handleUpdateTextValue(selectedText.id, { strokeColor: e.target.value })} />
-                  </div>
-                </div>
-
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                    <span>字号尺寸 ({selectedText.size}px)</span>
-                    <span><Move style={{ width: 12 }} /> 拖动Canvas可位移</span>
-                  </label>
-                  <input type="range" min="12" max="64" value={selectedText.size} onChange={(e) => handleUpdateTextValue(selectedText.id, { size: parseInt(e.target.value) })} style={{ accentColor: 'var(--primary)' }} />
-                </div>
-
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ fontSize: '0.75rem' }}>文字描边粗细 ({selectedText.strokeWidth}px)</label>
-                  <input type="range" min="0" max="12" value={selectedText.strokeWidth} onChange={(e) => handleUpdateTextValue(selectedText.id, { strokeWidth: parseInt(e.target.value) })} style={{ accentColor: 'var(--primary)' }} />
-                </div>
-              </div>
-            ) : selectedSticker ? (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--secondary)', fontWeight: 700 }}>[贴纸图层: {selectedSticker.type}]</span>
-                  <button className="btn btn-secondary" style={{ padding: '2px 8px', fontSize: '0.7rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDeleteSticker(selectedSticker.id)}>
-                    <Trash2 style={{ width: 12, marginRight: 2 }} /> 删除贴纸
-                  </button>
-                </div>
-
-                <div className="input-group" style={{ margin: 0 }}>
-                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                    <span>贴纸大小 ({selectedSticker.size}px)</span>
-                    <span><Move style={{ width: 12 }} /> 拖动Canvas可位移</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="15"
-                    max="150"
-                    value={selectedSticker.size}
-                    onChange={(e) => setStickers(prev => prev.map(s => s.id === selectedSticker.id ? { ...s, size: parseInt(e.target.value) } : s))}
-                    style={{ accentColor: 'var(--primary)' }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div style={{ padding: '1.5rem', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                💡 <b>交互提示：</b> 直接点击或触摸 Canvas 上的文字/贴纸，可在此激活精细调节。在 Canvas 上拖拽它们可以调整排列位置。
+                <span style={{ fontWeight: 600, color: 'var(--primary)', whiteSpace: 'nowrap' }}>编辑底图</span>
               </div>
             )}
+
+            {MEME_TEMPLATES.map((tpl) => (
+              <div
+                key={tpl.id}
+                onClick={() => setSelectedTemplate(tpl)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px',
+                  borderRadius: 'var(--radius-md)',
+                  background: selectedTemplate.id === tpl.id ? 'var(--primary-glow)' : 'var(--bg-input)',
+                  border: `1px solid ${selectedTemplate.id === tpl.id ? 'var(--primary)' : 'var(--border-color)'}`,
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  minWidth: '95px',
+                  flexShrink: 0,
+                  transition: 'var(--transition-smooth)'
+                }}
+              >
+                <div
+                  style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                  dangerouslySetInnerHTML={{ __html: tpl.svg }}
+                />
+                <span style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '85px' }}>
+                  {tpl.name.split(' ')[0]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Layers & Stickers Adder */}
+        <div className="glass-panel" style={{ margin: 0, padding: '1rem 1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {/* Text Adder */}
+            <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', fontSize: '0.85rem', padding: '0.6rem' }} onClick={handleAddText}>
+              <Plus style={{ width: 16 }} />
+              新增文字层
+            </button>
+
+            {/* Stickers list */}
+            <div style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginTop: '4px' }}>
+              <button className="btn btn-secondary" style={{ padding: '8px 0', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleAddSticker('glasses')} title="🕶️ 墨镜">🕶️</button>
+              <button className="btn btn-secondary" style={{ padding: '8px 0', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleAddSticker('chain')} title="🪙 大金链子">🪙</button>
+              <button className="btn btn-secondary" style={{ padding: '8px 0', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleAddSticker('question')} title="❓ 问号">❓</button>
+              <button className="btn btn-secondary" style={{ padding: '8px 0', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleAddSticker('tears')} title="💦 眼泪">💦</button>
+              <button className="btn btn-secondary" style={{ padding: '8px 0', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleAddSticker('blush')} title="🌸 腮红">🌸</button>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Active Element Customizer */}
+        <div className="glass-panel" style={{ margin: 0, padding: '1.25rem' }}>
+          <div className="input-label" style={{ marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+            🛠️ 选定图层调节
           </div>
 
-          {/* 2. Layers & Stickers Adder */}
-          <div className="glass-panel" style={{ margin: 0 }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {/* Text Adder */}
-              <button className="btn btn-secondary" style={{ flex: '1', display: 'flex', gap: '6px', fontSize: '0.85rem' }} onClick={handleAddText}>
-                <Plus style={{ width: 16 }} />
-                新增文字层
-              </button>
+          {selectedText ? (
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700 }}>[文字图层]</span>
+                <button className="btn btn-secondary" style={{ padding: '2px 8px', fontSize: '0.7rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDeleteText(selectedText.id)}>
+                  <Trash2 style={{ width: 12, marginRight: 2 }} /> 删除文字
+                </button>
+              </div>
+              
+              <input
+                type="text"
+                className="input-field"
+                value={selectedText.text}
+                onChange={(e) => handleUpdateTextValue(selectedText.id, { text: e.target.value })}
+              />
 
-              {/* Stickers list */}
-              <div style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginTop: '6px' }}>
-                <button className="btn btn-secondary" style={{ padding: '6px 0', fontSize: '1.25rem' }} onClick={() => handleAddSticker('glasses')} title="🕶️ 墨镜">🕶️</button>
-                <button className="btn btn-secondary" style={{ padding: '6px 0', fontSize: '1.25rem' }} onClick={() => handleAddSticker('chain')} title="🪙 大金链子">🪙</button>
-                <button className="btn btn-secondary" style={{ padding: '6px 0', fontSize: '1.25rem' }} onClick={() => handleAddSticker('question')} title="❓ 问号">❓</button>
-                <button className="btn btn-secondary" style={{ padding: '6px 0', fontSize: '1.25rem' }} onClick={() => handleAddSticker('tears')} title="💦 眼泪">💦</button>
-                <button className="btn btn-secondary" style={{ padding: '6px 0', fontSize: '1.25rem' }} onClick={() => handleAddSticker('blush')} title="🌸 腮红">🌸</button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="input-group" style={{ margin: 0 }}>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>文字颜色</label>
+                  <input type="color" className="input-field" style={{ padding: '2px', height: '36px', width: '100%' }} value={selectedText.color} onChange={(e) => handleUpdateTextValue(selectedText.id, { color: e.target.value })} />
+                </div>
+                <div className="input-group" style={{ margin: 0 }}>
+                  <label className="input-label" style={{ fontSize: '0.75rem' }}>描边颜色</label>
+                  <input type="color" className="input-field" style={{ padding: '2px', height: '36px', width: '100%' }} value={selectedText.strokeColor} onChange={(e) => handleUpdateTextValue(selectedText.id, { strokeColor: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="input-group" style={{ margin: 0 }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>字号尺寸 ({selectedText.size}px)</span>
+                  <span><Move style={{ width: 12 }} /> 拖动Canvas可位移</span>
+                </label>
+                <input type="range" min="12" max="64" value={selectedText.size} onChange={(e) => handleUpdateTextValue(selectedText.id, { size: parseInt(e.target.value) })} style={{ accentColor: 'var(--primary)' }} />
+              </div>
+
+              <div className="input-group" style={{ margin: 0 }}>
+                <label className="input-label" style={{ fontSize: '0.75rem' }}>文字描边粗细 ({selectedText.strokeWidth}px)</label>
+                <input type="range" min="0" max="12" value={selectedText.strokeWidth} onChange={(e) => handleUpdateTextValue(selectedText.id, { strokeWidth: parseInt(e.target.value) })} style={{ accentColor: 'var(--primary)' }} />
               </div>
             </div>
-          </div>
+          ) : selectedSticker ? (
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--secondary)', fontWeight: 700 }}>[贴纸图层: {selectedSticker.type}]</span>
+                <button className="btn btn-secondary" style={{ padding: '2px 8px', fontSize: '0.7rem', color: 'var(--danger)', borderColor: 'rgba(239, 68, 68, 0.2)' }} onClick={() => handleDeleteSticker(selectedSticker.id)}>
+                  <Trash2 style={{ width: 12, marginRight: 2 }} /> 删除贴纸
+                </button>
+              </div>
 
-          {/* 3. Preset Templates */}
-          <div className="glass-panel" style={{ margin: 0, maxHeight: '300px', overflowY: 'auto' }}>
-            <div className="input-label" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Laugh style={{ width: 16, color: 'var(--primary)' }} />
-              切换底图模板
+              <div className="input-group" style={{ margin: 0 }}>
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span>贴纸大小 ({selectedSticker.size}px)</span>
+                  <span><Move style={{ width: 12 }} /> 拖动Canvas可位移</span>
+                </label>
+                <input
+                  type="range"
+                  min="15"
+                  max="150"
+                  value={selectedSticker.size}
+                  onChange={(e) => setStickers(prev => prev.map(s => s.id === selectedSticker.id ? { ...s, size: parseInt(e.target.value) } : s))}
+                  style={{ accentColor: 'var(--primary)' }}
+                />
+              </div>
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {MEME_TEMPLATES.map((tpl) => (
-                <div
-                  key={tpl.id}
-                  onClick={() => setSelectedTemplate(tpl)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    background: selectedTemplate.id === tpl.id ? 'var(--primary-glow)' : 'var(--bg-input)',
-                    border: `1px solid ${selectedTemplate.id === tpl.id ? 'var(--primary)' : 'var(--border-color)'}`,
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                    transition: 'var(--transition-smooth)'
-                  }}
-                >
-                  <div
-                    style={{ width: '42px', height: '42px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                    dangerouslySetInnerHTML={{ __html: tpl.svg }}
-                  />
-                  <span style={{ fontWeight: 500 }}>{tpl.name}</span>
-                </div>
-              ))}
-
-              {currentImage && (
-                <div
-                  onClick={() => {
-                    setSelectedTemplate({
-                      id: 'imported_image',
-                      name: '导入的自定义图片',
-                      layout: 'top-bottom',
-                      defaultText: '自定义文本',
-                      svg: ''
-                    });
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    background: selectedTemplate.id === 'imported_image' ? 'var(--primary-glow)' : 'var(--bg-input)',
-                    border: `1px solid ${selectedTemplate.id === 'imported_image' ? 'var(--primary)' : 'var(--border-color)'}`,
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                    transition: 'var(--transition-smooth)',
-                    borderStyle: 'dashed'
-                  }}
-                >
-                  <img
-                    src={currentImage}
-                    alt="Imported"
-                    style={{ width: '42px', height: '42px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'var(--primary)' }}>★ 导入的编辑底图</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>点击对此图片加字/贴纸</div>
-                  </div>
-                </div>
-              )}
+          ) : (
+            <div style={{ padding: '1.25rem', textAlign: 'center', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              💡 <b>交互提示：</b> 直接点击或触摸 Canvas 上的文字/贴纸，可在此激活精细调节。在 Canvas 上拖拽或触摸移动它们可以调整位置。
             </div>
-          </div>
-
+          )}
         </div>
 
       </div>

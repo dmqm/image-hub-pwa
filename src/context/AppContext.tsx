@@ -11,10 +11,14 @@ export interface GalleryItem {
 }
 
 export type ColorTheme = 'cyberpunk' | 'amoled' | 'aurora' | 'light';
+export type SubToolType = 'none' | 'ai' | 'meme' | 'studio' | 'creator';
 
 interface AppContextType {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  
+  activeSubTool: SubToolType;
+  setActiveSubTool: (tool: SubToolType) => void;
   
   // Color Themes
   theme: ColorTheme;
@@ -46,7 +50,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<string>('search');
+  const [activeTab, setActiveTabState] = useState<string>('search');
+  const [activeSubTool, setActiveSubTool] = useState<SubToolType>('none');
   
   // Themes
   const [theme, setThemeState] = useState<ColorTheme>(() => (localStorage.getItem('ih_theme') as ColorTheme) || 'cyberpunk');
@@ -61,6 +66,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   // Current Active Image in Studio Editor
   const [currentImage, setCurrentImage] = useState<string | null>(null);
+
+  const setActiveTab = (tab: string) => {
+    setActiveTabState(tab);
+    setActiveSubTool('none'); // Reset active sub-tool when navigating to a new tab
+  };
 
   // Initialize Gallery & Apply Theme
   useEffect(() => {
@@ -233,13 +243,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const importToStudio = (dataUrl: string) => {
     setCurrentImage(dataUrl);
-    setActiveTab('studio');
+    setActiveTab('tools');
+    setActiveSubTool('studio');
   };
 
   return (
     <AppContext.Provider value={{
       activeTab,
       setActiveTab,
+      activeSubTool,
+      setActiveSubTool,
       theme,
       setTheme,
       siliconFlowKey,
