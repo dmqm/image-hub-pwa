@@ -1,0 +1,507 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useApp } from '../context/AppContext';
+import { PRESET_IMAGES } from '../data/presets';
+import { Search, Upload, RefreshCw, Sliders, Heart, Check, Trash2 } from 'lucide-react';
+
+// Combined item interface for rendering
+interface SearchResultItem {
+  id: string;
+  url: string;
+  title: string;
+  tags: string[];
+  color: { r: number; g: number; b: number };
+  isPreset: boolean;
+}
+
+export const SearchHub: React.FC = () => {
+  const { pixabayKey, addToGallery, gallery, importToStudio } = useApp();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeSource, setActiveSource] = useState<'online' | 'local'>('local');
+  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  
+  // Color Search State
+  const [selectedColor, setSelectedColor] = useState<{ r: number; g: number; b: number } | null>(null);
+  const [selectedColorName, setSelectedColorName] = useState<string>('');
+  const [uploadedColorImage, setUploadedColorImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Preset Colors for Quick Click Filter
+  const colorPalette = [
+    { name: '艳红', color: { r: 239, g: 68, b: 68 } },
+    { name: '暖橙', color: { r: 249, g: 115, b: 22 } },
+    { name: '明黄', color: { r: 234, g: 179, b: 8 } },
+    { name: '翠绿', color: { r: 34, g: 197, b: 94 } },
+    { name: '青蓝', color: { r: 6, g: 182, b: 212 } },
+    { name: '深蓝', color: { r: 59, g: 130, b: 246 } },
+    { name: '幽紫', color: { r: 168, g: 85, b: 247 } },
+    { name: '极光粉', color: { r: 236, g: 72, b: 153 } },
+    { name: '暗夜黑', color: { r: 15, g: 15, b: 25 } }
+  ];
+
+  // Saved success state for feedback
+  const [savedIds, setSavedIds] = useState<Record<string, boolean>>({});
+
+  // Initialize and Search
+  useEffect(() => {
+    handleSearch();
+  }, [activeSource]);
+
+  // Trigger search when user presses Enter
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setErrorMsg('');
+    
+    // Clear uploaded color image when searching
+    if (searchQuery && uploadedColorImage) {
+      setUploadedColorImage(null);
+      setSelectedColor(null);
+    }
+
+    try {
+      if (activeSource === 'local') {
+        // Local Filter
+        const localResults: SearchResultItem[] = [];
+        
+        // 1. Add preset images
+        PRESET_IMAGES.forEach(p => {
+          if (!searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.tags.some(t => t.includes(searchQuery))) {
+            localResults.push({
+              id: p.id,
+              url: p.url,
+              title: p.title,
+              tags: p.tags,
+              color: p.color,
+              isPreset: true
+            });
+          }
+        });
+        
+        // 2. Add saved gallery images
+        gallery.forEach(g => {
+          if (!searchQuery || g.title.toLowerCase().includes(searchQuery.toLowerCase()) || g.tags.some(t => t.includes(searchQuery))) {
+            localResults.push({
+              id: g.id,
+              url: g.dataUrl,
+              title: g.title,
+              tags: g.tags,
+              color: g.color,
+              isPreset: false
+            });
+          }
+        });
+        
+        setSearchResults(localResults);
+      } else {
+        // Online Pixabay Search
+        if (!pixabayKey) {
+          setErrorMsg('未配置 Pixabay API Key。请在“系统设置”中填入您的 Key，或使用“内置图库”。');
+          setSearchResults([]);
+          setLoading(false);
+          return;
+        }
+
+        const query = searchQuery.trim() || 'beautiful nature';
+        const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=20`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('网络响应错误，请检查 API Key 是否正确或网络是否通畅');
+        }
+        
+        const data = await response.json();
+        if (data.hits && data.hits.length > 0) {
+          // Pixabay returns colors as dominant tags, but we'll assign a mock/average color for similarity search
+          // Or we can dynamically compute the average color if we draw it to a canvas. 
+          // For Pixabay images, we will dynamically compute it on-demand or use a helper average color.
+          const onlineResults: SearchResultItem[] = data.hits.map((hit: any) => ({
+            id: `online_${hit.id}`,
+            url: hit.webformatURL,
+            title: hit.tags || '在线图片',
+            tags: (hit.tags || '').split(',').map((t: string) => t.trim()),
+            // Default middle grey color, we can extract actual color when importing to Studio
+            color: { r: 128, g: 128, b: 128 },
+            isPreset: false
+          }));
+          setSearchResults(onlineResults);
+        } else {
+          setSearchResults([]);
+          setErrorMsg('未找到相关图片，请尝试其他关键词。');
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || '获取图片失败，请检查国内网络连接或 Pixabay Key。');
+      // Auto fallback to local
+      if (activeSource === 'online') {
+        setErrorMsg('在线获取失败，已自动切换到内置图库。');
+        setActiveSource('local');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Color Similarity Matcher
+  // Calculates Euclidean distance: sqrt((r1-r2)^2 + (g1-g2)^2 + (b1-b2)^2)
+  const getColorDistance = (c1: { r: number; g: number; b: number }, c2: { r: number; g: number; b: number }) => {
+    return Math.sqrt(
+      Math.pow(c1.r - c2.r, 2) +
+      Math.pow(c1.g - c2.g, 2) +
+      Math.pow(c1.b - c2.b, 2)
+    );
+  };
+
+  // Sort search results based on color proximity if a color is selected
+  const getSortedResults = () => {
+    if (!selectedColor) return searchResults;
+    return [...searchResults].sort((a, b) => {
+      return getColorDistance(a.color, selectedColor) - getColorDistance(b.color, selectedColor);
+    });
+  };
+
+  // Extract average color from uploaded image
+  const handleColorImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setUploadedColorImage(dataUrl);
+
+      // Extract color
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 16;
+        canvas.height = 16;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 16, 16);
+          const imgData = ctx.getImageData(0, 0, 16, 16);
+          const data = imgData.data;
+          let r = 0, g = 0, b = 0, count = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            count++;
+          }
+          const avgColor = {
+            r: Math.round(r / count),
+            g: Math.round(g / count),
+            b: Math.round(b / count)
+          };
+          setSelectedColor(avgColor);
+          setSelectedColorName('图片提取色');
+        }
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveToGallery = async (item: SearchResultItem) => {
+    try {
+      // If it's a URL (like Pixabay), we convert to Base64 first to store in IndexedDB
+      let dataUrl = item.url;
+      if (item.url.startsWith('http')) {
+        setLoading(true);
+        const response = await fetch(item.url);
+        const blob = await response.blob();
+        dataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+        setLoading(false);
+      }
+
+      await addToGallery(dataUrl, item.title, item.tags, item.color);
+      setSavedIds(prev => ({ ...prev, [item.id]: true }));
+      setTimeout(() => {
+        setSavedIds(prev => ({ ...prev, [item.id]: false }));
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      alert('保存失败，可能是由于跨域限制无法下载在线图片。建议直接点击“导入编辑”！');
+      setLoading(false);
+    }
+  };
+
+  const handleImportToStudio = async (item: SearchResultItem) => {
+    try {
+      let dataUrl = item.url;
+      if (item.url.startsWith('http')) {
+        setLoading(true);
+        // Fetch via blob to convert to Base64 to bypass Canvas CORS issues when drawing
+        const response = await fetch(item.url);
+        const blob = await response.blob();
+        dataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+        setLoading(false);
+      }
+      importToStudio(dataUrl);
+    } catch (err) {
+      console.error(err);
+      // Fallback: import URL directly (might trigger CORS on canvas later, but allows proceeding)
+      importToStudio(item.url);
+      setLoading(false);
+    }
+  };
+
+  const sortedResults = getSortedResults();
+
+  return (
+    <div className="animate-fade-in">
+      <div className="page-header">
+        <h1 className="page-title">搜图中心</h1>
+        <p className="page-subtitle">探索高清灵感图片，支持以色搜图和一键导入处理</p>
+      </div>
+
+      {/* Source & Search Control */}
+      <div className="glass-panel" style={{ padding: '1.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          {/* Tab Switch */}
+          <div style={{ display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '4px', border: '1px solid var(--border-color)' }}>
+            <button
+              className={`btn ${activeSource === 'local' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ padding: '0.5rem 1.25rem', borderRadius: '10px', boxShadow: activeSource === 'local' ? '' : 'none', border: 'none' }}
+              onClick={() => setActiveSource('local')}
+            >
+              内置与本地图库
+            </button>
+            <button
+              className={`btn ${activeSource === 'online' ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ padding: '0.5rem 1.25rem', borderRadius: '10px', boxShadow: activeSource === 'online' ? '' : 'none', border: 'none' }}
+              onClick={() => setActiveSource('online')}
+            >
+              在线 Pixabay 搜图
+            </button>
+          </div>
+
+          {/* Search Inputs */}
+          <div style={{ display: 'flex', gap: '0.5rem', flex: '1', minWidth: '280px', maxWidth: '500px' }}>
+            <input
+              type="text"
+              className="input-field"
+              style={{ flex: '1', margin: 0 }}
+              placeholder={activeSource === 'local' ? "搜索标签或图片名称..." : "输入英文关键词（如 'neon space'）"}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button className="btn btn-primary" onClick={handleSearch} disabled={loading}>
+              {loading ? <RefreshCw className="animate-spin" style={{ width: 18 }} /> : <Search style={{ width: 18 }} />}
+              搜索
+            </button>
+          </div>
+        </div>
+
+        {/* Color Search Panel (以色搜图) */}
+        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <Sliders style={{ width: 18, color: 'var(--primary)' }} />
+            <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>色彩过滤与以色搜图</span>
+            {selectedColor && (
+              <span style={{ fontSize: '0.8rem', background: 'var(--primary-glow)', border: '1px solid var(--primary)', padding: '2px 8px', borderRadius: '10px', color: 'var(--text-primary)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                已启用: {selectedColorName}
+                <Trash2
+                  style={{ width: 12, cursor: 'pointer', color: 'var(--danger)' }}
+                  onClick={() => {
+                    setSelectedColor(null);
+                    setUploadedColorImage(null);
+                  }}
+                />
+              </span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+            {/* Color Palette Filter */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', flex: '1', minWidth: '260px' }}>
+              {colorPalette.map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    setSelectedColor(item.color);
+                    setSelectedColorName(item.name);
+                    setUploadedColorImage(null);
+                  }}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    border: selectedColor && selectedColor.r === item.color.r && selectedColor.g === item.color.g && selectedColor.b === item.color.b
+                      ? '2px solid #ffffff'
+                      : '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                    transition: 'transform 0.2s',
+                  }}
+                  title={item.name}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+              ))}
+            </div>
+
+            {/* Upload image to match color */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleColorImageUpload}
+                style={{ display: 'none' }}
+              />
+              <button
+                className="btn btn-secondary"
+                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload style={{ width: 16 }} />
+                上传图片找相似色
+              </button>
+              
+              {uploadedColorImage && (
+                <img
+                  src={uploadedColorImage}
+                  alt="Upload Color Source"
+                  style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--primary)' }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {errorMsg && (
+        <div className="glass-panel animate-fade-in" style={{ borderColor: 'var(--danger)', background: 'rgba(239, 68, 68, 0.05)', color: 'var(--danger)', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span>⚠️ {errorMsg}</span>
+        </div>
+      )}
+
+      {/* Grid List */}
+      {loading && searchResults.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', gap: '1rem', color: 'var(--text-secondary)' }}>
+          <RefreshCw className="animate-spin" style={{ width: 40, height: 40, color: 'var(--primary)' }} />
+          <span>正在加载美图...</span>
+        </div>
+      ) : sortedResults.length === 0 ? (
+        <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-secondary)' }}>
+          <span>暂无图片数据。请输入其他关键词，或者在右上角切换至“内置与本地图库”！</span>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {sortedResults.map((item) => (
+            <div
+              key={item.id}
+              className="glass-panel animate-fade-in"
+              style={{
+                padding: '10px',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.3s, border-color 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-6px)';
+                e.currentTarget.style.borderColor = 'var(--border-color-hover)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
+              }}
+            >
+              {/* Image Box */}
+              <div style={{ position: 'relative', width: '100%', height: '200px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#0a0a14' }}>
+                <img
+                  src={item.url}
+                  alt={item.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  loading="lazy"
+                />
+                
+                {/* Labels & Tags */}
+                {item.isPreset && (
+                  <span style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, padding: '3px 8px', borderRadius: '6px', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>
+                    内置推荐
+                  </span>
+                )}
+                
+                {/* Color Dot Indicator */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: `rgb(${item.color.r}, ${item.color.g}, ${item.color.b})`,
+                    border: '2px solid #ffffff',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                  }}
+                  title={`平均色彩: RGB(${item.color.r}, ${item.color.g}, ${item.color.b})`}
+                />
+              </div>
+
+              {/* Text Meta */}
+              <div style={{ padding: '10px 5px', flex: '1', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {item.title}
+                </h3>
+                
+                {/* Tags */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                  {item.tags.slice(0, 3).map((tag, idx) => (
+                    <span key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Card Action Buttons */}
+                <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                  <button
+                    className="btn btn-secondary"
+                    style={{ flex: '1', padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                    onClick={() => handleImportToStudio(item)}
+                  >
+                    导入编辑
+                  </button>
+                  <button
+                    className={`btn ${savedIds[item.id] ? 'btn-secondary' : 'btn-primary'}`}
+                    style={{ padding: '0.5rem 0.85rem', color: savedIds[item.id] ? 'var(--success)' : '' }}
+                    onClick={() => handleSaveToGallery(item)}
+                    disabled={savedIds[item.id] || loading}
+                    title="保存到画廊"
+                  >
+                    {savedIds[item.id] ? <Check style={{ width: 16 }} /> : <Heart style={{ width: 16, fill: 'none' }} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
