@@ -75,7 +75,7 @@ export const Gallery: React.FC = () => {
 
       {/* Grid gallery */}
       {filteredGallery.length === 0 ? (
-        <div className="glass-panel animate-fade-in" style={{ textAlign: 'center', padding: '2.5rem 1.5rem', color: 'var(--text-secondary)' }}>
+        <div className="glass-panel animate-fade-in" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2.5rem 1.5rem', color: 'var(--text-secondary)' }}>
           <Image style={{ width: 44, height: 44, strokeWidth: 1.25, color: 'var(--text-muted)', marginBottom: '1rem', marginLeft: 'auto', marginRight: 'auto' }} />
           {gallery.length === 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>

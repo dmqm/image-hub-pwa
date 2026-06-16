@@ -56,13 +56,15 @@ export const ToolsPortal: React.FC = () => {
               className="glass-panel"
               style={{
                 margin: 0,
-                padding: '0.85rem 0.6rem',
+                padding: '1.25rem 0.75rem',
+                aspectRatio: '1/1',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                justifyContent: 'center',
                 textAlign: 'center',
-                gap: '8px',
+                gap: '10px',
                 transition: 'var(--transition-smooth)',
                 position: 'relative',
                 overflow: 'hidden'
@@ -87,8 +89,8 @@ export const ToolsPortal: React.FC = () => {
               {/* Icon Container */}
               <div
                 style={{
-                  width: '38px',
-                  height: '38px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: 'var(--radius-sm)',
                   background: t.color,
                   display: 'flex',
@@ -99,15 +101,15 @@ export const ToolsPortal: React.FC = () => {
                   flexShrink: 0
                 }}
               >
-                <IconComponent style={{ width: 18, height: 18 }} />
+                <IconComponent style={{ width: 20, height: 20 }} />
               </div>
 
               {/* Info */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '2px', color: 'var(--text-primary)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                   {t.title}
                 </h3>
-                <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', lineHeight: '1.2', margin: 0 }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.3', margin: 0 }}>
                   {t.desc}
                 </p>
               </div>
